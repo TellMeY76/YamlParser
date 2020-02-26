@@ -1,6 +1,43 @@
+<style>
+    .ui-steps .ui-steps-item {
+        width: 33% !important;
+    }
+
+    .content-h3 {
+        color: #5c666a;
+        font-weight: 400;
+        font-size: 1.5em;
+    }
+</style>
 <p-card>
+    <p-steps [model]="stepItems" styleClass="steps-custom"></p-steps>
+    <h3 class="content-h3">Basic</h3>
     <div>
-        <label>分析器类型</label>
+        <label>分析器类型：</label>
         <p-dropdown [options]="cities1" [(ngModel)]="selectedCities1"></p-dropdown>
+    </div>
+    <br>
+    <div>
+        <label>分析器名称：</label>
+        <input type="text" pInputText />
+    </div>
+
+    <h3 class="content-h3">Case</h3>
+    <div>
+        <p-tabView>
+            <p-tabPanel header="分析项 1" [closable]="true">
+                Content 1
+            </p-tabPanel>
+            <p-tabPanel header="分析项 2" [closable]="true">
+                Content 2
+            </p-tabPanel>
+            <p-tabPanel header="分析项 3" [closable]="true">
+                Content 3
+            </p-tabPanel>
+            <p-tabPanel header="+" [disabled]="true" (click)="addCondition()">
+                Content 3
+            </p-tabPanel>
+        </p-tabView>
+
     </div>
 </p-card>

@@ -1,0 +1,17 @@
+<div class="dialog-content" *ngIf="analyzer">
+
+    <h2 class="dialig-title">{{analyzer.name}}（{{analyzer.online?'已上线':'未上线'}}）</h2>
+    <p class="dialig-line--1st">分析器类型：{{analyzer.type}}</p>
+    <p class="dialig-line--1st">运行时间：({{analyzer.runMonth}}) 月</p>
+    <p class="dialig-line--1st">运行前提条件： {{analyzer.applyOn}}</p>
+    <p class="dialig-line--1st">分析器数量：{{analyzer.tree.length}}个</p>
+
+    <div class="dialog-block" *ngFor="let treeItem of analyzer.tree;index as i">
+        <p class="dialig-line--1st">分析项名称：{{treeItem.name?treeItem.name:'CASE'+(i+1)}}</p>
+        <p class="dialig-line--2nd">条件{{StatusList[treeItem.status]}}：{{treeItem.condition}}，出发分析结果，包括</p>
+        <p class="dialig-line--1st">标题：{{treeItem.title}}</p>
+        <!-- <pre class="dialig-line--3rd">分析项内容描述：{{treeItem.description}}</pre> -->
+        <pre class="dialig-line--3rd">建议摘要：{{treeItem.summary}}</pre>
+        <pre class="dialig-line--3rd">建议正文：{{treeItem.advice}}</pre>
+    </div>
+</div>

@@ -1,1 +1,9 @@
-<app-case-edit></app-case-edit>
+<div style="margin: 10px 0px;">
+    <p-breadcrumb [model]="breadMenuItems" [home]="menuHome"></p-breadcrumb>
+</div>
+
+<div style="display: flex;">
+    <app-case-list></app-case-list>
+    <app-case-edit (addTaskInPath)="addTaskInPath($event)"></app-case-edit>
+    <!-- <app-path-task [analyzer]="analyzer"></app-path-task> -->
+</div>

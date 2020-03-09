@@ -1,0 +1,43 @@
+.dialog-content {
+  max-height: 450px;
+  padding: 0 10px 20px 10px;
+  .dialig-title {
+    text-align: center;
+  }
+
+  .dialig-line--1st {
+    position: relative;
+    &:before {
+      content: "*";
+      position: absolute;
+      left: -10px;
+      top: 2px;
+    }
+    text-indent: 1em;
+    margin: 10px 0;
+  }
+
+  .dialig-line--2nd,
+  .dialig-line--3rd {
+    position: relative;
+
+    &:before {
+      content: "-";
+      position: absolute;
+      left: -10px;
+      top: 2px;
+    }
+    text-indent: 2em;
+  }
+
+  .content-h4,
+  .dialig-line {
+    text-indent: 1em;
+  }
+
+  pre {
+    text-indent: 2em;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+}

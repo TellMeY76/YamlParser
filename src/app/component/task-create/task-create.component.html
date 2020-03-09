@@ -1,0 +1,31 @@
+<div>
+    <form>
+        <label>任务标题</label>
+        <input type="text" pInputText />
+        <label>任务副标题</label>
+        <input type="text" pInputText />
+        <label>任务描述</label>
+        <textarea pInputTextarea></textarea>
+        <label>任务时间</label>
+        <div>
+            <div class="ui-g-12">
+                <p-radioButton name="group1" value="fixed" label="选择固定时间" [(ngModel)]="dateType" inputId="opt1">
+                </p-radioButton>
+            </div>
+            <div class="ui-g-12">
+                <p-radioButton name="group1" value="flexiable" label="没有固定时间" [(ngModel)]="dateType" inputId="opt2">
+                </p-radioButton>
+            </div>
+        </div>
+
+        <ng-template [ngIf]="dateType" [ngIfElse]="elseDate">
+            <p-calendar selectionMode="range" [readonlyInput]='true'></p-calendar>
+        </ng-template>
+        <ng-template #elseDate>
+            <label>开始日期：分析时间 + </label>
+            <input type="text" pInputText />天
+            <label>截止日期：开始日期 + </label>
+            <input type="text" pInputText />天
+        </ng-template>
+    </form>
+</div>

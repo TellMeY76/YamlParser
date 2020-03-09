@@ -1,43 +1,136 @@
-<style>
-    .ui-steps .ui-steps-item {
-        width: 33% !important;
-    }
-
-    .content-h3 {
-        color: #5c666a;
-        font-weight: 400;
-        font-size: 1.5em;
-    }
-</style>
 <p-card>
-    <p-steps [model]="stepItems" styleClass="steps-custom"></p-steps>
-    <h3 class="content-h3">Basic</h3>
-    <div>
-        <label>分析器类型：</label>
-        <p-dropdown [options]="cities1" [(ngModel)]="selectedCities1"></p-dropdown>
+    <!-- <p-steps [model]="stepItems" styleClass="steps-custom"></p-steps> -->
+    <h3 class="content-h3">基本信息</h3>
+    <div class="baseInfo">
+        <div class="fldInput">
+            <h4 class="content-h4">分析器类型：</h4>
+            <input type="text" pInputText [(ngModel)]="analyzer.type" />
+        </div>
+        <div class="fldInput">
+            <h4 class="content-h4">分析器名称：</h4>
+            <input type="text" pInputText [(ngModel)]="analyzer.name" />
+        </div>
+        <div class="fldInput">
+            <h4 class="content-h4">上线：</h4>
+            <p-inputSwitch [(ngModel)]="analyzer.online"></p-inputSwitch>
+        </div>
     </div>
-    <br>
-    <div>
-        <label>分析器名称：</label>
-        <input type="text" pInputText />
+    <div class="fldInput singleInput">
+        <h4 class="content-h4">分析器运行时间：</h4>
+        <p-multiSelect [filter]="hidefliter" [maxSelectedLabels]=12 [options]="month" [(ngModel)]="analyzer.runMonth">
+        </p-multiSelect>
     </div>
+    <div class="fldInput singleInput">
+        <h4 class="content-h4">所需条件：</h4>
+        <p-multiSelect [maxSelectedLabels]=4 selectedItemsLabel="已选 {0} 项" defaultLabel="请选取需要用到的条件"
+            [options]="conditions" optionLabel="label" [(ngModel)]="conditionsRequired">
+        </p-multiSelect>
+    </div>
+    <h4 class="content-h4">适用场景 <i (click)="addApplyOn(analyzer.applyOn)" class="addBtn pi pi-plus-circle"></i></h4>
+    <p-table [value]="analyzer.applyOn">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>字段名</th>
+                <th>对应值</th>
+                <th style="width: 5em;">操作</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tree>
+            <tr>
+                <td>
+                    <p-dropdown [options]="conditionsRequired" placeholder="选择字段" [(ngModel)]="tree.input"
+                        optionLabel="label">
+                    </p-dropdown>
+                </td>
+                <td>
+                    <input type="text" pInputText [(ngModel)]="tree.input.value" />
+                </td>
+                <td style="text-align: center;">
+                    <button pButton type="button" class="ui-button-danger" icon="pi pi-trash"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <h3 class="content-h3">配置分析项 <i (click)="addConditionTab()" class="addBtn pi pi-plus-circle"></i>
+    </h3>
+    <div>
+        <p-tabView (onChange)="tabChange($event)">
+            <p-tabPanel *ngFor="let treeItem of analyzer.tree;index as i" [selected]="i===0"
+                [header]="treeItem.name?treeItem.name:'CASE '+(i+1)" [closable]="true">
+                <div class="analyzerTable">
+                    <div class="fldInput">
+                        <h4 class="content-h4">名称:</h4>
+                        <input type="text" pInputText [(ngModel)]="treeItem.name" />
+                    </div>
+                    <div class="fldInput">
+                        <h4 class="content-h4">标题:</h4>
+                        <input type="text" pInputText [(ngModel)]="treeItem.title" />
+                    </div>
+                    <div class="fldInput">
+                        <h4 class="content-h4">条件状态:</h4>
+                        <p-dropdown [options]="status" [(ngModel)]="treeItem.status"></p-dropdown>
+                    </div>
 
-    <h3 class="content-h3">Case</h3>
-    <div>
-        <p-tabView>
-            <p-tabPanel header="分析项 1" [closable]="true">
-                Content 1
-            </p-tabPanel>
-            <p-tabPanel header="分析项 2" [closable]="true">
-                Content 2
-            </p-tabPanel>
-            <p-tabPanel header="分析项 3" [closable]="true">
-                Content 3
-            </p-tabPanel>
-            <p-tabPanel header="+" [disabled]="true" (click)="addCondition()">
-                Content 3
+                </div>
+
+                <h4 class="content-h4">条件项 <i (click)="addCondition(treeItem)" class="addBtn pi pi-plus-circle"></i>
+                </h4>
+                <p-table [value]="treeItem.condition">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>字段名</th>
+                            <th>判断条件</th>
+                            <th>判断值</th>
+                            <th style="width: 5em;">操作</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-condition let-rowIndex="rowIndex">
+                        <tr>
+                            <td>
+                                <p-dropdown [options]="conditionsRequired" placeholder="选择字段"
+                                    [(ngModel)]="condition.input" optionLabel="label">
+                                </p-dropdown>
+                            </td>
+                            <td>
+                                <p-dropdown [options]="symbols" [(ngModel)]="condition.input.symbol"></p-dropdown>
+                            </td>
+                            <td>
+                                <input type="text" [placeholder]="condition.input.inputType===1?'只允许填入数字':''"
+                                    [pValidateOnly]=true pInputText
+                                    [pKeyFilter]="condition.input.inputType === 1?numReg:noSpecial"
+                                    [(ngModel)]="condition.input.value" />
+                            </td>
+                            <td style="text-align: center;">
+                                <button pButton type="button" class="ui-button-danger" icon="pi pi-trash"></button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+                <div class="fldInput fldInput-textarea">
+                    <h4 class="content-h4">描述:</h4>
+                    <textarea class="normal-textarea" rows="4" cols="100" [(ngModel)]=" treeItem.description"
+                        pInputTextarea></textarea>
+                </div>
+                <div class="fldInput fldInput-textarea">
+                    <h4 class="content-h4">建议摘要:</h4>
+                    <textarea class="normal-textarea" rows="4" cols="100" [(ngModel)]=" treeItem.summary"
+                        pInputTextarea></textarea>
+                </div>
+                <div class="fldInput fldInput-textarea">
+                    <h4 class="content-h4" style="width: 4.9em;">建议:</h4>
+                    <textarea [(ngModel)]="treeItem.advice" rows="4" cols="96" pInputTextarea
+                        autoResize="autoResize"></textarea>
+                </div>
+
             </p-tabPanel>
         </p-tabView>
-
     </div>
+    <p-footer style="display: flex;margin: 10px 0;flex-direction: row-reverse;">
+
+        <button pButton type="button" label="保存配置" icon="pi pi-check" style="margin-right: .5em"></button>
+        <button pButton type="button" label="配置任务" (click)="toAddTask()" icon="pi pi-arrow-right" style="margin-right: .5em"></button>
+        <button pButton type="button" label="预览" icon="pi pi-search" (click)='showPreDialog()'
+            style="margin-right: .5em" class="ui-button-secondary"></button>
+    </p-footer>
 </p-card>
+<p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000"></p-confirmDialog>

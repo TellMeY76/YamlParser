@@ -4,14 +4,17 @@
   font-weight: 400;
   font-size: 1.5em;
 }
+
 .content-h4 {
   margin: 10px 0;
   font-size: 1.2em;
 }
+
 .baseInfo,
 .fldInput {
   display: flex;
 }
+
 .fldInput {
   margin-right: 10px;
   align-items: center;
@@ -25,6 +28,7 @@
 .analyzerTable .fldInput {
   margin-right: 20px;
   justify-content: space-between;
+
   input,
   p-dropdown {
     margin-left: 10px;
@@ -39,16 +43,22 @@
 .fldInput-textarea {
   margin: 10px 0;
   align-items: baseline;
+
   .content-h4 {
     width: 4.3em;
   }
+
   .normal-textarea {
     margin-left: 10px;
     resize: none;
-    width: 50em;
-    height: 5em;
-    max-width: 50em;
-    max-height: 5em;
+    width: 80%;
+    height: 8em;
+    max-width: 90em;
+    max-height: 8em;
+  }
+
+  .normal-textarea.small {
+    height: 3em;
   }
 }
 
@@ -56,6 +66,7 @@
   width: 400px;
   max-height: 450px;
   padding: 0 10px;
+
   .dialig-line {
     margin: 10px 0;
   }
@@ -74,4 +85,135 @@
 
 .table-toggle {
   width: 100%;
+}
+
+.notification {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 1010;
+}
+
+.temp-item .ui-md-3 {
+  text-align: center;
+}
+
+.temp-item .ui-g-10 {
+  font-weight: bold;
+}
+
+.empty-car-item-index {
+  background-color: #f1f1f1;
+  width: 60px;
+  height: 60px;
+  margin: 36px auto 0 auto;
+  animation: pulse 1s infinite ease-in-out;
+}
+
+.empty-car-item-image {
+  background-color: #f1f1f1;
+  width: 120px;
+  height: 120px;
+  animation: pulse 1s infinite ease-in-out;
+}
+
+.empty-car-item-text {
+  background-color: #f1f1f1;
+  height: 18px;
+  animation: pulse 1s infinite ease-in-out;
+}
+
+.title-container {
+  padding: 1em;
+  text-align: right;
+}
+
+.sort-container {
+  text-align: left;
+}
+
+.temp-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #d9dad9;
+}
+
+.task-dialog {
+  margin-left: 10px;
+
+  .date-config-block {
+    display: flex;
+    margin-left: 3em;
+    margin-top: -18px;
+
+    span {
+      display: inline-block;
+      vertical-align: bottom;
+    }
+  }
+
+  .fldInput-textarea {
+    width: 100%;
+
+    h4 {
+      width: 5em;
+    }
+
+    .normal-textarea {
+      width: 100%;
+    }
+  }
+
+  .tips {
+    position: absolute;
+    bottom: 30px;
+  }
+
+  .foot {
+    position: absolute;
+    bottom: 20px;
+    right: 5%;
+    width: 180px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .desc {
+    height: 10em !important;
+    max-height: 10em;
+    width: 100%;
+  }
+
+  .err-msg {
+    margin-left: 10px;
+  }
+}
+
+.loading-block {
+  margin-left: 2%;
+  width: 96%;
+}
+
+.task-temp-val {
+  max-width: 60em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.task-temp-block {
+  max-width: 90%;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: space-between;
+  width: 120px;
+
+  button {
+    font-size: 18px;
+  }
 }

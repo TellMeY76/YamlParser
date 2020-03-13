@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+.ui-steps .ui-steps-item,
+.ui-steps.steps-custom .ui-steps-item {
+  width: 33% !important;
+}
+
+td {
+  .ui-dropdown,
+  .ui-inputtext {
+    width: 100% !important;
+  }
+}

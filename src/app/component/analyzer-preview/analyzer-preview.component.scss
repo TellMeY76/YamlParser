@@ -1,18 +1,26 @@
 .dialog-content {
-  max-height: 450px;
+  height: 500px;
   padding: 0 10px 20px 10px;
+
+  p {
+    margin: 5px 0 !important;
+  }
+
   .dialig-title {
+    margin: 0;
     text-align: center;
   }
 
   .dialig-line--1st {
     position: relative;
+
     &:before {
       content: "*";
       position: absolute;
       left: -10px;
       top: 2px;
     }
+
     text-indent: 1em;
     margin: 10px 0;
   }
@@ -25,9 +33,14 @@
       content: "-";
       position: absolute;
       left: -10px;
-      top: 2px;
+      top: 0px;
     }
+  }
+  .dialig-line--2nd {
     text-indent: 2em;
+  }
+  .dialig-line--3rd {
+    text-indent: 3em;
   }
 
   .content-h4,
@@ -37,7 +50,24 @@
 
   pre {
     text-indent: 2em;
+    padding: 0 2em;
+    margin: 0;
     white-space: pre-wrap;
     word-wrap: break-word;
+  }
+
+  .hideAd {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  .dialog-block-list {
+    margin-top: -15px;
+    margin-bottom: 10px;
+    height: 315px;
+    overflow: auto;
   }
 }

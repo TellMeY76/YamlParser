@@ -6,7 +6,7 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['./path-task.component.scss']
 })
 export class PathTaskComponent implements OnInit {
-  // @Input() analyzer: any
+  @Input() analyzer: any
   constructor() { }
 
   ngOnInit(): void {

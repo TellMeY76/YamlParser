@@ -1,142 +1,45 @@
-import { Component, OnInit, Output, EventEmitter } from "@angular/core";
-import { SelectItem } from "primeng/api";
-import { MenuItem } from "primeng/api";
-import { CaseServiceService } from "src/app/service/case-service.service";
-import { ConfirmationService } from "primeng/api";
-import { AnalyzerPreviewComponent } from "../analyzer-preview/analyzer-preview.component";
-import { DialogService } from "primeng/dynamicDialog";
-
-interface Tree {
-  name?: string;
-  title?: string;
-  condition: string | tableItem[];
-  description?: string;
-  summary?: string;
-  advice?: string;
-  status?: number;
-  condConns?: boolean[];
-  knowledgeIds?: string[];
-}
-
-interface AnalyzerInput {
-  id?: string;
-  title: string;
-  value: string;
-  symbol?: any;
-  inputType?: number;
-  connection?: boolean;
-}
-
-interface Analyzer {
-  name: string;
-  type: string;
-  online: boolean;
-  runMonth: string[];
-  applyOn: string | tableItem[];
-  tree: Tree[];
-}
-
-class tableItem {
-  input: AnalyzerInput;
-}
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ConfirmationService, Message, MessageService, SelectItem } from 'primeng/api';
+import { CaseServiceService } from 'src/app/service/case-service.service';
+import { AnalyzerPreviewComponent } from '../analyzer-preview/analyzer-preview.component';
+import { DialogService } from 'primeng/dynamicDialog';
+import { Analyzer, AnalyzerInput, TableItem } from '../../model/Analyzer';
+import { Result } from '../../model/result';
+import { numReg, noSpecial } from '../../config/regex';
+import { TaskTemplate } from '../../model/taskTemplate';
+import { TaskTemplateDialogComponent } from '../task-template-dialog/task-template-dialog.component';
 
 @Component({
-  selector: "app-case-edit",
-  templateUrl: "./case-edit.component.html",
-  styleUrls: ["./case-edit.component.scss"],
-  providers: [ConfirmationService, DialogService]
+  selector: 'app-case-edit',
+  templateUrl: './case-edit.component.html',
+  styleUrls: ['./case-edit.component.scss'],
+  providers: [MessageService, ConfirmationService, DialogService]
 })
 export class CaseEditComponent implements OnInit {
-  noSpecial: RegExp = /^[^<>*!]+$/;
-  numReg: RegExp = /^-?([1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|0)$/;
-  @Output() addTaskInPath = new EventEmitter();
-  stepItems: MenuItem[] = [
-    { label: "新建分析器" },
-    { label: "添加任务" },
-    { label: "完成" }
-  ];
-  StatusList = {
-    0: "不满足",
-    1: "满足",
-    2: "不足"
-  };
-  dialogShow = false;
-  tabIdx = 0;
+
+  readonly numReg = numReg;
+  readonly noSpecial = noSpecial;
+  tabIdx: number;
   types: SelectItem[];
-  month: SelectItem[] = [];
-  conditions: AnalyzerInput[];
-  conditionsRequired: AnalyzerInput[];
+  month: SelectItem[];
   symbols: SelectItem[];
   status: SelectItem[];
   KnowledgeIds: SelectItem[];
-  preContent: string = "";
-  hidefliter = false;
-  yamldata: string;
-  analyzer: Analyzer = {
-    name: "",
-    type: "--",
-    online: false,
-    runMonth: [],
-    applyOn: [{ input: { title: "", value: "" } }],
-    tree: [
-      {
-        condConns: [],
-        condition: [{ input: { title: "", symbol: "", value: "" } }]
-      }
-    ]
-  };
+  analyzer: Analyzer;
+  conditions: AnalyzerInput[];
+  conditionsRequired: AnalyzerInput[];
+  messages: Message[];
 
   constructor(
     public caseService: CaseServiceService,
     public dialogService: DialogService,
-    public confirmationService: ConfirmationService
-  ) {
-    this.status = [
-      { label: "————", value: "" },
-      { label: "不满足", value: 0 },
-      { label: "满足", value: 1 },
-      { label: "条件不足", value: 2 }
-    ];
-    this.KnowledgeIds = [
-      { label: "————", value: "1" },
-      { label: "税收筹划", value: "2" },
-      { label: "项目申报", value: "3" },
-      { label: "高企申报", value: "4" },
-      { label: "机器查账", value: "5" }
-    ];
-    this.types = [
-      { label: "————", value: "" },
-      { label: "税收筹划", value: "税收筹划" },
-      { label: "项目申报", value: "项目申报" },
-      { label: "高企申报", value: "高企申报" },
-      { label: "机器查账", value: "机器查账" }
-    ];
-    this.symbols = [
-      { label: "=", value: "=" },
-      { label: ">", value: ">" },
-      { label: "<", value: "<" },
-      { label: ">=", value: ">=" },
-      { label: "<=", value: "<=" },
-      { label: "!=", value: "!=" }
-    ];
+    public confirmationService: ConfirmationService,
+    private changeDetectorRef: ChangeDetectorRef) {
+    this.initVariable();
   }
 
-  ngOnInit(): void {
-    this.getConditionInput();
-    for (let i = 1; i <= 12; i++) {
-      this.month.push({ label: `${i}月`, value: i + "" });
-      this.analyzer.runMonth.push(i + "");
-    }
-  }
-
-  getConditionInput() {
-    this.caseService.getCondition().subscribe(res => {
-      this.conditions = this.setConditionInput(res["data"]);
-    });
-  }
-
-  setConditionInput(conditionData) {
-    const conditions = conditionData.map(item => {
+  static setConditionInput(conditionData: AnalyzerInput[]) {
+    return conditionData.map(item => {
       return {
         label: item.title,
         title: item.value,
@@ -144,7 +47,59 @@ export class CaseEditComponent implements OnInit {
         inputType: item.inputType
       };
     });
-    return conditions;
+  }
+
+  initVariable() {
+    this.tabIdx = 0;
+    this.month = [];
+    this.messages = [];
+    this.analyzer = new Analyzer();
+    this.status = [
+      { label: '不满足', value: 0 },
+      { label: '满足', value: 1 },
+      { label: '条件不足', value: 2 }
+    ];
+    this.KnowledgeIds = [
+      { label: '税收筹划', value: '2' },
+      { label: '项目申报', value: '3' },
+      { label: '高企申报', value: '4' },
+      { label: '机器查账', value: '5' }
+    ];
+    this.types = [
+      { label: '税收筹划', value: '税收筹划' },
+      { label: '项目申报', value: '项目申报' },
+      { label: '创业补贴', value: '创业补贴' },
+      { label: '融资贷款', value: '融资贷款' },
+      { label: '高企申报', value: '高企申报' },
+      { label: '机器查账', value: '机器查账' },
+      { label: '软件企业', value: '软件企业' }
+    ];
+    this.symbols = [
+      { label: '=', value: '=' },
+      { label: '>', value: '>' },
+      { label: '<', value: '<' },
+      { label: '>=', value: '>=' },
+      { label: '<=', value: '<=' },
+      { label: '!=', value: '!=' }
+    ];
+  }
+
+  ngOnInit(): void {
+    this.getConditionInput();
+    this.initRunMonthList();
+  }
+
+  initRunMonthList() {
+    for (let i = 1; i <= 12; i++) {
+      this.month.push({ label: `${i}月`, value: i + '' });
+      this.analyzer.runMonth.push(i + '');
+    }
+  }
+
+  getConditionInput() {
+    this.caseService.getCondition().subscribe(res => {
+      this.conditions = CaseEditComponent.setConditionInput((res as unknown as Result).data || []);
+    });
   }
 
   tabChange(e) {
@@ -154,15 +109,14 @@ export class CaseEditComponent implements OnInit {
   addConditionTab() {
     let newTab;
     this.confirmationService.confirm({
-      message: "是否复制当前分析项的内容?",
+      message: '是否复制当前分析项的内容?',
       accept: () => {
-        const _temp = JSON.stringify(this.analyzer.tree[this.tabIdx]);
-        newTab = JSON.parse(_temp);
+        newTab = JSON.parse(JSON.stringify(this.analyzer.tree[this.tabIdx]));
         this.analyzer.tree.push(newTab);
       },
       reject: () => {
         newTab = {
-          condition: [{ input: { title: "", symbol: "", value: "" } }]
+          condition: [{ input: { title: '', symbol: '', value: '' } }]
         };
         this.analyzer.tree.push(newTab);
       }
@@ -171,61 +125,118 @@ export class CaseEditComponent implements OnInit {
 
   addCondition(treeItem) {
     treeItem.condition.push({
-      input: { title: "", symbol: "", value: "", connection: true }
+      input: { title: '', symbol: '', value: '', connection: true }
     });
   }
 
-  conditionFldChange(e, condition, idx) {
-    this.analyzer.tree = { ...condition, ...e.value };
+  addApplyOn(applyOnList) {
+    applyOnList.push({ input: { title: '', value: '' } });
   }
 
-  addApplyOn(aplyOnList) {
-    aplyOnList.push({ input: { title: "", value: "" } });
+  removeApplyOn(input: TableItem) {
+    if ((this.analyzer.applyOn as TableItem[]).length === 1) {
+      this.messages = [];
+      this.messages.push({ severity: 'warn', summary: '警告', detail: 'applyOn 不为空' });
+      return;
+    }
+    const index = (this.analyzer.applyOn as TableItem[]).indexOf(input);
+    this.analyzer.applyOn = (this.analyzer.applyOn as TableItem[]).filter((val, i) => i !== index);
   }
 
   showPreDialog() {
-    const analyzerJson = this.setYamldata();
+    console.log(this.conditionsRequired);
+    const analyzerJson = this.setYamlData();
     this.dialogService.open(AnalyzerPreviewComponent, {
       data: {
         analyzer: analyzerJson
       },
-      header: "预览分析器",
-      width: "50%"
+      header: '预览分析器',
+      width: '50%',
+      height: '500px',
+      closable: false
     });
   }
 
-  private setYamldata() {
-    const _tmp = JSON.stringify(this.analyzer);
-    const analyzerJson = JSON.parse(_tmp);
+  private setYamlData() {
+    const analyzerJson = JSON.parse(JSON.stringify(this.analyzer));
     analyzerJson.tree.forEach(item => {
-      if (typeof item.condition !== "string") {
-        const cdt = item.condition.reduce((total, current, index) => {
+      if (typeof item.condition !== 'string') {
+        item.condition = item.condition.reduce((total, current, index) => {
+          const condLabel = this.conditionsRequired ?
+            (this.conditionsRequired.filter(input => input.title === current.input.title)[0] as AnalyzerInput).label : '';
           const val = current.input.title
-            ? (index > 0 ? " AND " : "") +
-              `${current.input.title} ${
-                current.input.symbol ? current.input.symbol : "="
-              } ${current.input.value}`
-            : "";
+            ? (index > 0 ? ' AND ' : '') +
+            `${condLabel} ${
+            current.input.symbol ? current.input.symbol : '='
+            } ${current.input.value}`
+            : '';
           return total + val;
-        }, "");
-        item.condition = cdt;
+        }, '');
       }
     });
-    if (typeof analyzerJson.applyOn !== "string") {
-      const apOn = analyzerJson.applyOn.reduce((total, current, index) => {
+    if (typeof analyzerJson.applyOn !== 'string') {
+      analyzerJson.applyOn = analyzerJson.applyOn.reduce((total, current, index) => {
+        const appLabel = this.conditionsRequired ?
+          (this.conditionsRequired.filter(input => input.title === current.input.title)[0] as AnalyzerInput).label : '';
         const val = current.input.title
-          ? (index > 0 ? " AND " : "") +
-            `${current.input.title} = ${current.input.value}`
-          : "";
+          ? (index > 0 ? ' AND ' : '') +
+          `${appLabel} = ${current.input.value}`
+          : '';
         return total + val;
-      }, "");
-      analyzerJson.applyOn = apOn;
+      }, '');
     }
     return analyzerJson;
   }
 
-  toAddTask() {
-    const analyzer = this.setYamldata();
-    this.addTaskInPath.emit(analyzer);
+  checkTabAfterClose(e) {
+    const targetIndex = e.index;
+    this.analyzer.tree = this.analyzer.tree.filter((val, i) => i !== targetIndex);
+    if (this.tabIdx === targetIndex) {
+      this.tabIdx = 0;
+    }
+  }
+
+  removeCondition(condition: TableItem) {
+    if ((this.analyzer.tree[this.tabIdx].condition as TableItem[]).length === 1) {
+      this.messages = [];
+      this.messages.push({ severity: 'warn', summary: '警告', detail: 'condition 不为空' });
+      return;
+    }
+    const index = (this.analyzer.tree[this.tabIdx].condition as TableItem[]).indexOf(condition);
+    this.analyzer.tree[this.tabIdx].condition = (this.analyzer.tree[this.tabIdx].condition as TableItem[]).filter((val, i) => i !== index);
+  }
+
+  checkTaskTemplate(operate: string, temp?: TaskTemplate, index?: number) {
+    const ref = this.dialogService.open(TaskTemplateDialogComponent, {
+      header: `${operate === 'create' ? '创建任务模板' : '更新任务模板'}`,
+      width: '790px',
+      data: {
+        taskTemplate: temp ? temp : new TaskTemplate(),
+      },
+      contentStyle: { height: '510px', overflow: 'auto' },
+      closable: false
+    });
+
+    ref.onClose.subscribe((res: TaskTemplate) => {
+      if (res) {
+        if (operate === 'create') {
+          this.analyzer.tree[this.tabIdx].taskTemplates.push(res);
+        } else {
+          this.analyzer.tree[this.tabIdx].taskTemplates.splice(index, 1, res);
+        }
+        this.changeDetectorRef.detectChanges();
+      }
+    });
+  }
+
+  removeTaskTemplate(index: number) {
+    this.analyzer.tree[this.tabIdx].taskTemplates.splice(index, 1);
+  }
+
+  upperCaseName() {
+    const pathName = this.analyzer.tree[this.tabIdx].name;
+    if (pathName) {
+      this.analyzer.tree[this.tabIdx].name = pathName.toUpperCase();
+    }
   }
 }

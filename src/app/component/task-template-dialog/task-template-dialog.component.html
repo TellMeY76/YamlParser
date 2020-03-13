@@ -1,0 +1,110 @@
+<div class="task-dialog" [formGroup]="templateForm">
+
+  <!-- <p-sidebar [(visible)]="showTemplates" [baseZIndex]="10000000">
+    <h1 style="font-weight:normal">任务模板列表</h1>
+  </p-sidebar>
+  <button pButton type="button" label="选择已有模板" (click)="showTemplates = true" class="ui-button-secondary"></button> -->
+
+  <div class="fldInput fldInput-textarea">
+    <h4 class="content-h4">标题:</h4>
+    <textarea class="normal-textarea small" rows="2" cols="100" formControlName="title" pInputTextarea
+      required></textarea>
+    <div class="ui-grid-col-4 err-msg">
+      <p-message severity="error" text="标题不为空"
+        *ngIf="templateForm.controls['title'].invalid&&templateForm.controls['title'].touched"></p-message>
+    </div>
+  </div>
+  <div class="fldInput fldInput-textarea">
+    <h4 class="content-h4">摘要:</h4>
+    <textarea class="normal-textarea small" rows="2" cols="100" formControlName="abstract" pInputTextarea></textarea>
+    <div class="ui-grid-col-4 err-msg">
+      <p-message severity="error" text="摘要不为空"
+        *ngIf="templateForm.controls['abstract'].invalid&&templateForm.controls['abstract'].touched"></p-message>
+    </div>
+  </div>
+  <div class="fldInput fldInput-textarea">
+    <h4 class="content-h4" style="width: 6em;">描述:</h4>
+    <textarea class="desc" rows="4" cols="96" autoResize="autoResize" formControlName="description"
+      pInputTextarea></textarea>
+    <div class="ui-grid-col-4 err-msg">
+      <p-message severity="error" text="描述不为空"
+        *ngIf="templateForm.controls['description'].invalid&&templateForm.controls['description'].touched"></p-message>
+    </div>
+  </div>
+  <div class="fldInput fldInput-textarea" style="display: flex;align-items: center;">
+    <h4 class="content-h4" style="width: 4em;">时间:</h4>
+    <div class="ui-g" style="width:100%;">
+      <!-- <p-selectButton [options]="dateTypes" (onChange)="cleanDateType($event)">
+      </p-selectButton> -->
+      <div class="ui-g-2">
+        <p-radioButton name="dateType" [value]="1" label="不做设置" formControlName="dateType" (click)="cleanDateType()">
+        </p-radioButton>
+      </div>
+      <div class="ui-g-2">
+        <p-radioButton name="dateType" [value]="2" label="特定时间" formControlName="dateType" (click)="cleanDateType()">
+        </p-radioButton>
+      </div>
+      <div class="ui-g-2">
+        <p-radioButton name="dateType" [value]="3" label="固定时间" formControlName="dateType" (click)="cleanDateType()">
+        </p-radioButton>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="templateForm.get('dateType').value === 2" class="date-config-block">
+    <div class="ui-g-8" style="display:flex;align-items: center;">
+      <span>开始时间: 分析结果生成后 </span>
+      <input type="number" formControlName="startDays" style="width: 5em; margin: 0 5px;" pInputText />
+      <span>(天)</span>
+    </div>
+    <div class="ui-g-8" style="display:flex;align-items: center;">
+      <span>结束时间: 开始时间后 </span>
+      <input type="number" formControlName="endDays" style="width: 5em; margin: 0 5px" pInputText />
+      <span>(天)</span>
+    </div>
+    <div class="ui-grid-col-4 err-msg">
+      <p-message severity="error" text="请输入正确的天数（数字）"
+        *ngIf="(templateForm.controls['startDays'].touched || templateForm.controls['startDays'].endDays) && templateForm.errors?.dateRequired">
+      </p-message>
+      <p-message severity="error" text="请输入正确的天数（数字）"
+        *ngIf="templateForm.errors?.dateError && (templateForm.controls['startDays'].value && templateForm.controls['endDays'].value)">
+      </p-message>
+    </div>
+  </div>
+
+  <div *ngIf="templateForm.get('dateType').value  === 3" class="date-config-block">
+    <div class="ui-g-4" style="display: flex;width: 100%;align-items: center;">
+      <span>开始时间：</span>
+      <p-calendar formControlName="start" [locale]="zh" dateFormat="yy/mm/dd" showButtonBar="true"
+        [maxDate]="templateForm.get('end').value">
+      </p-calendar>
+    </div>
+    <div class="ui-g-4" style="display: flex;width: 100%;align-items: center;">
+      <span>结束时间：</span>
+      <p-calendar formControlName="end" [locale]="zh" dateFormat="yy/mm/dd" [minDate]="templateForm.get('start').value">
+      </p-calendar>
+    </div>
+    <!-- <div class="ui-g-4" style="display: flex;width: 100%;align-items: center;">
+      <span>开始时间 - 结束时间：</span>
+      <p-calendar [(ngModel)]="rangeDates" selectionMode="range" showButtonBar="true" [readonlyInput]="true"
+        [locale]="zh" dateFormat="yy/mm/dd" (onSelect)='selectRangeDate($event)'></p-calendar>
+    </div> -->
+    <div class="ui-grid-col-4 err-msg">
+      <p-message severity="error" text="请输入完整的开始/结束时间" *ngIf="templateForm.controls['start'].invalid&&templateForm.controls['start'].touched
+                  || templateForm.controls['end'].invalid&&templateForm.controls['end'].touched"></p-message>
+    </div>
+  </div>
+
+  <div class="tips">
+    <p *ngIf="templateForm.get('dateType').value === 2"><b>*实际开始时间为分析结果生成当天加上指定天数，实际结束时间为开始时间当天加上指定天数</b></p>
+    <p *ngIf="templateForm.get('dateType').value === 3"><b>*开始结束时间为固定的日期</b></p>
+    <p>*执行人默认为分析者本人</p>
+    <p>*任务状态默认为待开始</p>
+    <p>*任务优先级默认为中</p>
+  </div>
+
+  <p-footer class="foot">
+    <button type="button" pButton icon="pi pi-check" label="保存" [disabled]="templateForm.invalid"
+      (click)="save()"></button>
+    <button type="button" pButton icon="pi pi-times" label="取消" class="ui-button-secondary" (click)="close()"></button>
+  </p-footer>
+</div>

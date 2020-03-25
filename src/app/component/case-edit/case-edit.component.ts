@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ConfirmationService, Message, MessageService, SelectItem } from 'primeng/api';
 import { CaseServiceService } from 'src/app/service/case-service.service';
 import { AnalyzerPreviewComponent } from '../analyzer-preview/analyzer-preview.component';
-import { DialogService } from 'primeng/dynamicDialog';
+import { DialogService } from 'primeng';
 import { Analyzer, AnalyzerInput, TableItem } from '../../model/Analyzer';
 import { Result } from '../../model/result';
 import { numReg, noSpecial } from '../../config/regex';
@@ -98,7 +98,7 @@ export class CaseEditComponent implements OnInit {
 
   getConditionInput() {
     this.caseService.getCondition().subscribe(res => {
-      this.conditions = CaseEditComponent.setConditionInput((res as unknown as Result).data || []);
+      this.conditions = CaseEditComponent.setConditionInput((res as unknown as Result).data ?? []);
     });
   }
 
@@ -151,8 +151,8 @@ export class CaseEditComponent implements OnInit {
         analyzer: analyzerJson
       },
       header: '预览分析器',
-      width: '50%',
-      height: '500px',
+      width: '90%',
+      height: '700px',
       closable: false
     });
   }
@@ -209,11 +209,11 @@ export class CaseEditComponent implements OnInit {
   checkTaskTemplate(operate: string, temp?: TaskTemplate, index?: number) {
     const ref = this.dialogService.open(TaskTemplateDialogComponent, {
       header: `${operate === 'create' ? '创建任务模板' : '更新任务模板'}`,
-      width: '790px',
+      width: '850px',
       data: {
         taskTemplate: temp ? temp : new TaskTemplate(),
       },
-      contentStyle: { height: '510px', overflow: 'auto' },
+      contentStyle: { height: '560px', overflow: 'auto' },
       closable: false
     });
 

@@ -10,3 +10,13 @@ td {
     width: 100% !important;
   }
 }
+
+body .ui-accordion .ui-accordion-content {
+  max-height: 200px;
+  overflow: scroll;
+}
+
+.ui-accordion {
+  max-height: 330px;
+  overflow: scroll;
+}

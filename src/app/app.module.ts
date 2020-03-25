@@ -31,6 +31,7 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SidebarModule } from 'primeng/sidebar';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { AccordionModule } from 'primeng/accordion';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -87,6 +88,7 @@ import { TaskTemplateDialogComponent } from './component/task-template-dialog/ta
     VirtualScrollerModule,
     SelectButtonModule,
     ScrollPanelModule,
+    AccordionModule,
     SidebarModule,
     DataViewModule,
   ],

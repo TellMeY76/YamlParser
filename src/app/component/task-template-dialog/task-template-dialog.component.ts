@@ -18,11 +18,18 @@ export class TaskTemplateDialogComponent implements OnInit {
     { label: '特定时间', value: '2' },
     { label: '固定时间', value: '3' }
   ];
+  templates: TaskTemplate[] = [
+    { title: '不关联现有任务', dateType: 1 },
+    { title: '任务模板1', dateType: 1 },
+    { title: '任务模板2', dateType: 1 },
+    { title: '任务模板2', dateType: 1 }
+  ];
+
   constructor(
     private fb: FormBuilder,
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig) {
-    this.taskTemplate = config.data.taskTemplate || new TaskTemplate();
+    this.taskTemplate = config.data.taskTemplate ?? new TaskTemplate();
   }
 
   taskTemplate: TaskTemplate;

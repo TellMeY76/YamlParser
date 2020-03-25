@@ -4,7 +4,20 @@
     <h1 style="font-weight:normal">任务模板列表</h1>
   </p-sidebar>
   <button pButton type="button" label="选择已有模板" (click)="showTemplates = true" class="ui-button-secondary"></button> -->
-
+  <div class="fldInput fldInput-textarea">
+    <h4 class="content-h4">现有任务:</h4>
+    <p-dropdown filter="true" [options]="templates" optionLabel="title"
+      placeholder="关联现有任务模板" [showClear]="false">
+      <ng-template let-item pTemplate="selectedItem">
+        <span style="vertical-align:middle; margin-left: .5em">{{item.label}}</span>
+      </ng-template>
+      <ng-template let-temp pTemplate="item">
+        <div class="ui-helper-clearfix" style="position: relative;height: 25px;">
+          <div style="font-size:14px;margin-top:4px">{{temp.label}}</div>
+        </div>
+      </ng-template>
+    </p-dropdown>
+  </div>
   <div class="fldInput fldInput-textarea">
     <h4 class="content-h4">标题:</h4>
     <textarea class="normal-textarea small" rows="2" cols="100" formControlName="title" pInputTextarea
@@ -32,7 +45,7 @@
     </div>
   </div>
   <div class="fldInput fldInput-textarea" style="display: flex;align-items: center;">
-    <h4 class="content-h4" style="width: 4em;">时间:</h4>
+    <h4 class="content-h4" style="width: 3em;">时间:</h4>
     <div class="ui-g" style="width:100%;">
       <!-- <p-selectButton [options]="dateTypes" (onChange)="cleanDateType($event)">
       </p-selectButton> -->
@@ -74,8 +87,7 @@
   <div *ngIf="templateForm.get('dateType').value  === 3" class="date-config-block">
     <div class="ui-g-4" style="display: flex;width: 100%;align-items: center;">
       <span>开始时间：</span>
-      <p-calendar formControlName="start" [locale]="zh" dateFormat="yy/mm/dd" showButtonBar="true"
-        [maxDate]="templateForm.get('end').value">
+      <p-calendar formControlName="start" [locale]="zh" dateFormat="yy/mm/dd" [maxDate]="templateForm.get('end').value">
       </p-calendar>
     </div>
     <div class="ui-g-4" style="display: flex;width: 100%;align-items: center;">

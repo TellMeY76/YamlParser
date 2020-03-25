@@ -29,7 +29,7 @@ export class CaseListComponent implements OnInit {
   getAnalyzerList() {
     this.caseService.getAnalyzerList().subscribe(res => {
       if (res) {
-        this.analyzers = (res as unknown as Result).data || [];
+        this.analyzers = (res as unknown as Result).data ?? [];
       }
     });
   }

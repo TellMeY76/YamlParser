@@ -6,6 +6,11 @@
     margin: 5px 0 !important;
   }
 
+  h4,
+  h5 {
+    margin: 0;
+  }
+
   .dialig-title {
     margin: 0;
     text-align: center;
@@ -50,7 +55,6 @@
 
   pre {
     text-indent: 2em;
-    padding: 0 2em;
     margin: 0;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -69,5 +73,19 @@
     margin-bottom: 10px;
     height: 315px;
     overflow: auto;
+  }
+  .rt-border {
+    border-right: 1px solid #c8c8c8;
+  }
+  .showAllTask {
+    .more-taskItem {
+      display: block !important;
+    }
+  }
+  .more-taskItem {
+    display: none;
+  }
+  .case-taskItem {
+    border-bottom: 1px solid #c8c8c8;
   }
 }

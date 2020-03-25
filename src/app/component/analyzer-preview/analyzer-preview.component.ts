@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicDialog';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng';
 import { Dialog } from 'primeng';
 
 @Component({
@@ -30,5 +30,13 @@ export class AnalyzerPreviewComponent implements OnInit {
 
   showAdvice(index: number) {
     this.analyzer.tree[index]['showAllAd'] = this.analyzer.tree[index]['showAllAd'] ? !this.analyzer.tree[index]['showAllAd'] : true;
+  }
+
+  showTask(index: number) {
+    this.analyzer.tree[index]['showTask'] = this.analyzer.tree[index]['showTask'] ? !this.analyzer.tree[index]['showTask'] : true;
+  }
+
+  showAllTask(index: number) {
+    this.analyzer.tree[index]['showAllTask'] = this.analyzer.tree[index]['showAllTask'] ? !this.analyzer.tree[index]['showAllTask'] : true;
   }
 }

@@ -49,7 +49,7 @@
   }
 
   .normal-textarea {
-    margin-left: 10px;
+    margin-left: 5px;
     resize: none;
     width: 80%;
     height: 8em;
@@ -141,8 +141,6 @@
 }
 
 .task-dialog {
-  margin-left: 60px;
-
   .date-config-block {
     display: flex;
     margin-top: -10px;
@@ -161,13 +159,13 @@
     }
 
     .normal-textarea {
-      width: 75em;
+      width: 70 em;
     }
   }
 
   .tips {
     position: absolute;
-    bottom: 30px;
+    bottom: 10px;
   }
 
   .foot {
@@ -215,4 +213,9 @@
   button {
     font-size: 18px;
   }
+}
+
+.taxRadio.ui-radiobutton {
+  margin-left: 20px;
+  vertical-align: bottom;
 }

@@ -1,0 +1,13 @@
+.analyzer-container {
+    padding: 0 20px;
+    max-height: 80vh;
+    max-width: 1000px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.foot-bar {
+    display: flex;
+    padding: 10px 0;
+    flex-direction: row-reverse;
+}

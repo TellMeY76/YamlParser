@@ -1,21 +1,23 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, Output, EventEmitter, Input, OnChanges, ViewEncapsulation } from '@angular/core';
 import { ConfirmationService, Message, MessageService, SelectItem } from 'primeng/api';
 import { CaseServiceService } from 'src/app/service/case-service.service';
 import { AnalyzerPreviewComponent } from '../analyzer-preview/analyzer-preview.component';
 import { DialogService } from 'primeng';
-import { Analyzer, AnalyzerInput, TableItem } from '../../model/Analyzer';
+import { Analyzer, AnalyzerInput, TableItem, AnalyzerSelect } from '../../model/Analyzer';
 import { Result } from '../../model/result';
 import { numReg, noSpecial } from '../../config/regex';
 import { TaskTemplate } from '../../model/taskTemplate';
 import { TaskTemplateDialogComponent } from '../task-template-dialog/task-template-dialog.component';
+import { taxTypes } from 'src/app/config/taxType';
 
 @Component({
   selector: 'app-case-edit',
   templateUrl: './case-edit.component.html',
   styleUrls: ['./case-edit.component.scss'],
-  providers: [MessageService, ConfirmationService, DialogService]
+  providers: [MessageService, ConfirmationService, DialogService],
+  encapsulation: ViewEncapsulation.None
 })
-export class CaseEditComponent implements OnInit {
+export class CaseEditComponent implements OnInit, OnChanges {
 
   readonly numReg = numReg;
   readonly noSpecial = noSpecial;
@@ -25,10 +27,12 @@ export class CaseEditComponent implements OnInit {
   symbols: SelectItem[];
   status: SelectItem[];
   KnowledgeIds: SelectItem[];
-  analyzer: Analyzer;
+  @Input() analyzer: Analyzer;
   conditions: AnalyzerInput[];
-  conditionsRequired: AnalyzerInput[];
+  conditionsRequired: SelectItem[];
   messages: Message[];
+  TaxTypes = taxTypes;
+  @Output() setTasks = new EventEmitter<Analyzer>();
 
   constructor(
     public caseService: CaseServiceService,
@@ -38,9 +42,11 @@ export class CaseEditComponent implements OnInit {
     this.initVariable();
   }
 
-  static setConditionInput(conditionData: AnalyzerInput[]) {
+  setConditionInput(conditionData: AnalyzerInput[]) {
+    this.setConditionsRequired();
     return conditionData.map(item => {
       return {
+        id: item.id,
         label: item.title,
         title: item.value,
         value: null,
@@ -49,11 +55,24 @@ export class CaseEditComponent implements OnInit {
     });
   }
 
+  setConditionsRequired() {
+    const analyzerInputs = JSON.parse(JSON.stringify(this.analyzer.analyzerInputs)) as AnalyzerInput[];
+    this.conditionsRequired = analyzerInputs ? analyzerInputs.map(item => {
+      return { label: item.label, value: item.title };
+    }) : [];
+  }
+
+  changeCondRequire(e) {
+    const selectedCond = e.value as AnalyzerSelect[];
+    this.conditionsRequired = selectedCond.map(item => {
+      return { label: item.label, value: item.title };
+    });
+  }
+
   initVariable() {
     this.tabIdx = 0;
     this.month = [];
     this.messages = [];
-    this.analyzer = new Analyzer();
     this.status = [
       { label: '不满足', value: 0 },
       { label: '满足', value: 1 },
@@ -86,19 +105,22 @@ export class CaseEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.getConditionInput();
-    this.initRunMonthList();
+    // this.initRunMonthList();
+  }
+
+  ngOnChanges() {
+    this.setConditionsRequired();
   }
 
   initRunMonthList() {
-    for (let i = 1; i <= 12; i++) {
-      this.month.push({ label: `${i}月`, value: i + '' });
-      this.analyzer.runMonth.push(i + '');
-    }
+    this.month = [...Array(12).keys()].map(item => {
+      return { label: `${item + 1}月`, value: item + 1 + '' };
+    });
   }
 
   getConditionInput() {
     this.caseService.getCondition().subscribe(res => {
-      this.conditions = CaseEditComponent.setConditionInput((res as unknown as Result).data ?? []);
+      this.conditions = this.setConditionInput((res as unknown as Result).data ?? []);
     });
   }
 
@@ -112,19 +134,20 @@ export class CaseEditComponent implements OnInit {
       message: '是否复制当前分析项的内容?',
       accept: () => {
         newTab = JSON.parse(JSON.stringify(this.analyzer.tree[this.tabIdx]));
-        this.analyzer.tree.push(newTab);
+        newTab.id = '';
+        this.analyzer.tree = this.analyzer.tree.concat([newTab]);
       },
       reject: () => {
         newTab = {
-          condition: [{ input: { title: '', symbol: '', value: '' } }]
+          cond: [{ input: { title: '', symbol: '', value: '' } }]
         };
-        this.analyzer.tree.push(newTab);
+        this.analyzer.tree = this.analyzer.tree.concat([newTab]);
       }
     });
   }
 
   addCondition(treeItem) {
-    treeItem.condition.push({
+    treeItem.cond.push({
       input: { title: '', symbol: '', value: '', connection: true }
     });
   }
@@ -144,7 +167,6 @@ export class CaseEditComponent implements OnInit {
   }
 
   showPreDialog() {
-    console.log(this.conditionsRequired);
     const analyzerJson = this.setYamlData();
     this.dialogService.open(AnalyzerPreviewComponent, {
       data: {
@@ -160,8 +182,8 @@ export class CaseEditComponent implements OnInit {
   private setYamlData() {
     const analyzerJson = JSON.parse(JSON.stringify(this.analyzer));
     analyzerJson.tree.forEach(item => {
-      if (typeof item.condition !== 'string') {
-        item.condition = item.condition.reduce((total, current, index) => {
+      if (typeof item.cond !== 'string') {
+        item.cond = item.cond.reduce((total, current, index) => {
           const condLabel = this.conditionsRequired ?
             (this.conditionsRequired.filter(input => input.title === current.input.title)[0] as AnalyzerInput).label : '';
           const val = current.input.title
@@ -196,14 +218,14 @@ export class CaseEditComponent implements OnInit {
     }
   }
 
-  removeCondition(condition: TableItem) {
-    if ((this.analyzer.tree[this.tabIdx].condition as TableItem[]).length === 1) {
+  removeCondition(cond: TableItem) {
+    if ((this.analyzer.tree[this.tabIdx].cond as TableItem[]).length === 1) {
       this.messages = [];
       this.messages.push({ severity: 'warn', summary: '警告', detail: 'condition 不为空' });
       return;
     }
-    const index = (this.analyzer.tree[this.tabIdx].condition as TableItem[]).indexOf(condition);
-    this.analyzer.tree[this.tabIdx].condition = (this.analyzer.tree[this.tabIdx].condition as TableItem[]).filter((val, i) => i !== index);
+    const index = (this.analyzer.tree[this.tabIdx].cond as TableItem[]).indexOf(cond);
+    this.analyzer.tree[this.tabIdx].cond = (this.analyzer.tree[this.tabIdx].cond as TableItem[]).filter((val, i) => i !== index);
   }
 
   checkTaskTemplate(operate: string, temp?: TaskTemplate, index?: number) {
@@ -233,10 +255,20 @@ export class CaseEditComponent implements OnInit {
     this.analyzer.tree[this.tabIdx].taskTemplates.splice(index, 1);
   }
 
+  updateAnalyzer() {
+    const analyzer = this.setYamlData();
+    this.caseService.updateAnalyzer(analyzer).subscribe(res => {
+    });
+  }
+
   upperCaseName() {
     const pathName = this.analyzer.tree[this.tabIdx].name;
     if (pathName) {
       this.analyzer.tree[this.tabIdx].name = pathName.toUpperCase();
     }
+  }
+
+  setPathTasks() {
+    this.setTasks.emit(this.analyzer);
   }
 }

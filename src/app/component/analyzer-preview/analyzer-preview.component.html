@@ -2,15 +2,15 @@
 
   <h2 class="dialig-title">{{analyzer.name}}（{{analyzer.online ? '已上线' : '未上线'}}）</h2>
   <p class="dialig-line--1st">分析器类型：{{analyzer.type}}</p>
-  <p class="dialig-line--1st">运行时间：({{analyzer.runMonth}}) 月</p>
-  <p class="dialig-line--1st">运行前提条件： {{analyzer.applyOn}}</p>
+  <p class="dialig-line--1st">纳税人类型：{{TaxTypeNames[analyzer.taxType]}}</p>
+  <p class="dialig-line--1st">运行前提条件： {{analyzer?.applyOn || '无'}}</p>
   <p class="dialig-line--1st">分析器({{analyzer.tree.length}})：</p>
-  <p-accordion [multiple]="true">
+  <p-accordion [multiple]="true" styleClass='accordion'>
     <p-accordionTab
       [header]="(treeItem.name ? treeItem.name : 'CASE' + (i + 1)) + (treeItem.status === 0?' ✘ ':treeItem.status === 1?' ✔ ':' ? ')"
       *ngFor="let treeItem of analyzer.tree;index as i">
       <p class="dialig-line--2nd">
-        条件满足：{{treeItem.condition}}，触发分析结果，包括：
+        需满足条件：{{treeItem?.cond || '无'}}，条件满足时触发分析结果，包括：
       </p>
       <div class="ui-g">
         <div class="{{treeItem['showTask']?'ui-g-7 rt-border':'ui-g-12'}}">
@@ -18,7 +18,7 @@
           <p class="dialig-line--3rd">建议摘要：{{treeItem.summary}}</p>
           <p class="dialig-line--3rd">建议正文：</p>
           <pre class="{{treeItem['showAllAd']?'':'hideAd'}}">{{treeItem.advice}} </pre>
-          <p *ngIf="treeItem.advice" style="color: #135ba1;text-indent: 3em;" (click)='showAdvice(i)'>
+          <p *ngIf="treeItem.advice" class="task-link" (click)='showAdvice(i)'>
             {{ treeItem['showAllAd']?'收起':'查看建议完整内容'}}</p>
         </div>
         <div *ngIf="treeItem['showTask']" class="ui-g-5 {{treeItem['showAllTask']?'showAllTask':''}}"
@@ -26,7 +26,7 @@
           <h4>配置的任务模板：</h4>
           <ng-template ngFor let-item [ngForOf]="treeItem.taskTemplates" let-i="index">
             <div class="ui-g case-taskItem {{i>1?'more-taskItem':''}}">
-              <div class="ui-g-4" style="display: flex;align-items: center;justify-content: center;">
+              <div class="ui-g-4 task-title">
                 <h4>{{item?.title}}</h4>
               </div>
               <div class="ui-g-8">
@@ -44,74 +44,15 @@
           <ng-template [ngIf]="treeItem.taskTemplates.length <= 0">
             当前暂未配置任务模板
           </ng-template>
-          <p *ngIf="treeItem?.taskTemplates?.length>2" style="color: #135ba1;text-indent: 3em;"
-            (click)='showAllTask(i)'>
+          <p *ngIf="treeItem?.taskTemplates?.length>2" class="task-link" (click)='showAllTask(i)'>
             {{ treeItem['showAllTask']?'收起':'查看全部任务'}}</p>
         </div>
-        <p-footer style="width: 100%; display: flex;flex-direction: row-reverse;">
+        <p-footer class="case-footer">
           <button type="button" pButton (click)="showTask(i)" [label]="!treeItem['showTask']?'查看任务':'收起任务'"></button>
         </p-footer>
       </div>
     </p-accordionTab>
   </p-accordion>
-
-  <!-- <div class="dialog-block-list">
-    <div class="dialog-block" *ngFor="let treeItem of analyzer.tree;index as i">
-      <p class="dialig-line--1st">分析项名称：{{treeItem.name ? treeItem.name : 'CASE' + (i + 1)}}
-        <ng-template [ngIf]="treeItem.status === 0">
-          ✘
-        </ng-template>
-        <ng-template [ngIf]="treeItem.status === 1">
-          ✔
-        </ng-template>
-        <ng-template [ngIf]="treeItem.status === 2">
-          ?
-        </ng-template>
-      </p>
-
-      <p class="dialig-line--2nd">
-        条件满足：{{treeItem.condition}}，触发分析结果，包括：
-      </p>
-      <div class="ui-g">
-        <div class="ui-g-7 rt-border">
-          <h4>分析结果：{{treeItem.title}}</h4>
-          <p class="dialig-line--3rd">建议摘要：{{treeItem.summary}}</p>
-          <p class="dialig-line--3rd">建议正文：</p>
-          <pre class="{{treeItem['showAllAd']?'':'hideAd'}}">{{treeItem.advice}} </pre>
-          <p *ngIf="treeItem.advice" style="color: #135ba1;text-indent: 3em;" (click)='showAdvice(i)'>
-            {{ treeItem['showAllAd']?'收起':'查看建议完整内容'}}</p>
-        </div>
-        <div class="ui-g-5 {{treeItem['showAllTask']?'showAllTask':''}}" style="padding-left: 1.5em;">
-          <h4>配置的任务模板：</h4>
-          <ng-template ngFor let-item [ngForOf]="treeItem.taskTemplates" let-i="index">
-            <div class="ui-g case-taskItem {{i>1?'more-taskItem':''}}">
-              <div class="ui-g-4" style="display: flex;align-items: center;justify-content: center;">
-                <h4>{{item?.title}}</h4>
-              </div>
-              <div class="ui-g-8">
-                <p>摘要:{{item?.abstract}}</p>
-                <p>描述:{{item?.description}}</p>
-                <p>开始时间:
-                  <b>{{item?.dateType === 1 ? '不做设定' : (item?.dateType === 2 ? '分析结果生成后'.concat(item?.startDays).concat('天') : item?.start)}}</b>
-                </p>
-                <p>结束时间:
-                  <b>{{item?.dateType === 1 ? '不做设定' : (item?.dateType === 2 ? '开始时间后'.concat(item?.endDays).concat('天') : item?.end)}}</b>
-                </p>
-              </div>
-            </div>
-          </ng-template>
-          <ng-template [ngIf]="treeItem.taskTemplates.length <= 0">
-            当前暂未配置任务模板
-          </ng-template>
-          <p *ngIf="treeItem?.taskTemplates?.length>2" style="color: #135ba1;text-indent: 3em;"
-            (click)='showAllTask(i)'>
-            {{ treeItem['showAllTask']?'收起':'查看全部任务'}}</p>
-        </div>
-      </div>
-
-
-    </div>
-  </div> -->
-  <button type="button" style="position: absolute;top: -40px;right: 10px;" pButton icon="pi pi-times"
-    (click)="ref.close()" label="关闭" class="ui-button-secondary"></button>
+  <button type="button" pButton icon="pi pi-times" (click)="ref.close()" label="关闭"
+    class="ui-button-secondary close-btn"></button>
 </div>

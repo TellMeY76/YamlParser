@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CaseListComponent } from './case-list.component';
+import { CreateCaseDialogComponent } from './create-case-dialog.component';
 
-describe('CaseListComponent', () => {
-  let component: CaseListComponent;
-  let fixture: ComponentFixture<CaseListComponent>;
+describe('CreateCaseDialogComponent', () => {
+  let component: CreateCaseDialogComponent;
+  let fixture: ComponentFixture<CreateCaseDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CaseListComponent ]
+      declarations: [ CreateCaseDialogComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CaseListComponent);
+    fixture = TestBed.createComponent(CreateCaseDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

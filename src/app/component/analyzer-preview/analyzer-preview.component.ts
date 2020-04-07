@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng';
 import { Dialog } from 'primeng';
+import { Analyzer } from 'src/app/model/Analyzer';
+import { taxTypeNames } from 'src/app/config/taxType';
 
 @Component({
   selector: 'app-analyzer-preview',
   templateUrl: './analyzer-preview.component.html',
-  styleUrls: ['./analyzer-preview.component.scss']
+  styleUrls: ['./analyzer-preview.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class AnalyzerPreviewComponent implements OnInit {
   StatusList = {
@@ -13,7 +16,8 @@ export class AnalyzerPreviewComponent implements OnInit {
     1: '满足',
     2: '不足',
   };
-  analyzer: any;
+  analyzer: Analyzer;
+  TaxTypeNames = taxTypeNames;
 
   constructor(public ref: DynamicDialogRef, public dialogConfig: DynamicDialogConfig) {
     this.analyzer = dialogConfig.data.analyzer;
@@ -29,14 +33,14 @@ export class AnalyzerPreviewComponent implements OnInit {
   }
 
   showAdvice(index: number) {
-    this.analyzer.tree[index]['showAllAd'] = this.analyzer.tree[index]['showAllAd'] ? !this.analyzer.tree[index]['showAllAd'] : true;
+    this.analyzer.tree[index].showAllAd = this.analyzer.tree[index].showAllAd ? !this.analyzer.tree[index].showAllAd : true;
   }
 
   showTask(index: number) {
-    this.analyzer.tree[index]['showTask'] = this.analyzer.tree[index]['showTask'] ? !this.analyzer.tree[index]['showTask'] : true;
+    this.analyzer.tree[index].showTask = this.analyzer.tree[index].showTask ? !this.analyzer.tree[index].showTask : true;
   }
 
   showAllTask(index: number) {
-    this.analyzer.tree[index]['showAllTask'] = this.analyzer.tree[index]['showAllTask'] ? !this.analyzer.tree[index]['showAllTask'] : true;
+    this.analyzer.tree[index].showAllTask = this.analyzer.tree[index].showAllTask ? !this.analyzer.tree[index].showAllTask : true;
   }
 }

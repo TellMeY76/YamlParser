@@ -1,24 +1,38 @@
-
-<p-menu [model]="analyzer.tree"></p-menu>
-<p-card header="header">
-  <p-pickList
-    [source]="sourceCars"
-    [target]="targetCars"
-    sourceHeader="Available"
-    targetHeader="Selected"
-    [responsive]="true"
-    filterBy="brand"
-    dragdrop="true"
-    sourceFilterPlaceholder="Search by brand"
-    targetFilterPlaceholder="Search by brand"
-    [sourceStyle]="{ height: '300px' }"
-    [targetStyle]="{ height: '300px' }"
-  >
-    <ng-template let-car pTemplate="item">
-      <div class="ui-helper-clearfix">
-        <div></div>
-        <div style="font-size:14px;float:right;margin:15px 5px 0 0"></div>
-      </div>
-    </ng-template>
-  </p-pickList>
-</p-card>
+<p-button icon="pi pi-arrow-left" label="返回" (click)="hideTasks()"></p-button>
+<ng-template [ngIf]="analyzer">
+  <p-header>
+    <h3>分析路径任务配置</h3>
+  </p-header>
+  <div class="path-list">
+    <div class="ui-g" style="flex-wrap: nowrap;">
+      <ng-template ngFor let-treeItem [ngForOf]="analyzer.tree" pTemplate="item" let-i="index">
+        <div class="ui-g-3 ui-md-3 path-item">
+          <p-panel>
+            <p-header>
+              <div class="ui-helper-clearfix">
+                <span class="ui-panel-title path-name">{{treeItem?.name}}-{{treeItem?.title || ('未命名 ' + i)}}</span>
+              </div>
+            </p-header>
+            <p-scrollPanel [style]="{width: '100%', height: '430px'}">
+              <ng-template ngFor let-task [ngForOf]="treeItem.taskTemplates" let-taskIdx="index">
+                <div class="ui-g taskItem">
+                  <div class="ui-g-8 ui-md-8" (click)="checkTaskTemplate('update',i, task, taskIdx)">
+                    <div class="task-temp-val"><b>{{task?.title}}</b></div>
+                  </div>
+                  <div class="ui-g-4 ui-md-4 btn-group">
+                    <button pButton type="button" icon="pi pi-trash" class="ui-button-danger"
+                      (click)="removeTaskTemplate(i,taskIdx)"></button>
+                  </div>
+                </div>
+              </ng-template>
+            </p-scrollPanel>
+            <p-footer>
+              <button pButton type="button" icon="pi pi-plus" label="新增任务" class="ui-button-info"
+                (click)="checkTaskTemplate('create',i)" style="margin-right: .25em"></button>
+            </p-footer>
+          </p-panel>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</ng-template>

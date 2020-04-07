@@ -3,6 +3,9 @@ import { DynamicDialogConfig, DynamicDialogRef, MessageService } from 'primeng';
 import { TaskTemplate } from '../../model/taskTemplate';
 import { FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { SelectItem } from 'primeng/api';
+import { CaseServiceService } from 'src/app/service/case-service.service';
+import { Result } from 'src/app/model/result';
+import { OPERATE } from 'src/app/config/operate';
 
 @Component({
   selector: 'app-task-template-dialog',
@@ -12,23 +15,27 @@ import { SelectItem } from 'primeng/api';
 })
 export class TaskTemplateDialogComponent implements OnInit {
   zh: any;
+  readonly TaskTypes = {
+    bind: '1',
+    new: '2'
+  };
   rangeDates = '';
+  taskType = this.TaskTypes.bind;
+  taskTemps: TaskTemplate[] = [{ title: '1', dateType: 1 }];
+  selectedTemp: {};
   dateTypes = [
     { label: '不设置', value: '1' },
     { label: '特定时间', value: '2' },
     { label: '固定时间', value: '3' }
   ];
-  templates: TaskTemplate[] = [
-    { title: '不关联现有任务', dateType: 1 },
-    { title: '任务模板1', dateType: 1 },
-    { title: '任务模板2', dateType: 1 },
-    { title: '任务模板2', dateType: 1 }
-  ];
+  operate: string;
 
   constructor(
     private fb: FormBuilder,
     public ref: DynamicDialogRef,
+    public caseService: CaseServiceService,
     public config: DynamicDialogConfig) {
+    this.operate = config.data.operate ?? OPERATE.C;
     this.taskTemplate = config.data.taskTemplate ?? new TaskTemplate();
   }
 
@@ -48,21 +55,49 @@ export class TaskTemplateDialogComponent implements OnInit {
       abstract: new FormControl('', Validators.required),
       description: new FormControl('', Validators.required),
       dateType: new FormControl('', Validators.required),
-      startDays: new FormControl(''),
-      endDays: new FormControl(''),
+      startDays: new FormControl(0),
+      endDays: new FormControl(0),
       start: new FormControl(''),
       end: new FormControl(''),
     });
     this.setFormValue();
     this.initCalendar();
+    this.getTaskTemps();
+  }
+
+  getTaskTemps() {
+    this.caseService.getTaskTemps().subscribe(res => {
+      this.taskTemps = (res as unknown as Result)?.data as TaskTemplate[];
+    });
+  }
+
+  setTaskType(e) {
+    this.taskTemplate = e.value as TaskTemplate;
+    this.setFormValue();
+  }
+
+  resetTaskType() {
+    this.taskTemplate = this.config.data.taskTemplate ?? new TaskTemplate();
+    this.templateForm.reset();
+    if (this.taskType === this.TaskTypes.new) {
+      this.selectedTemp = {};
+      this.templateForm.enable();
+    }
   }
 
   setFormValue() {
     this.templateForm.reset('');
     for (const field of Object.keys(this.taskTemplate)) {
-      if (this.taskTemplate[field]) {
-        this.templateForm.get(field).setValue(this.taskTemplate[field]);
+      if (this.taskTemplate[field] && this.templateForm.get(field)) {
+        let fidVal = this.taskTemplate[field];
+        if ((field === 'start' || field === 'end') && typeof this.taskTemplate[field] === 'string') {
+          fidVal = new Date(this.taskTemplate[field]);
+        }
+        this.templateForm.get(field).setValue(fidVal);
       }
+    }
+    if (this.taskType === this.TaskTypes.bind || this.operate === OPERATE.U) {
+      this.templateForm.disable();
     }
   }
 
@@ -87,7 +122,19 @@ export class TaskTemplateDialogComponent implements OnInit {
       taskTemp.start = TaskTemplateDialogComponent.getYearMonth(taskTemp.start);
       taskTemp.end = TaskTemplateDialogComponent.getYearMonth(taskTemp.end);
     }
-    this.ref.close(taskTemp);
+    if (this.taskType === this.TaskTypes.bind) {
+      taskTemp.id = this.taskTemplate.id;
+      this.ref.close(taskTemp);
+    } else if (this.taskType === this.TaskTypes.new) {
+      this.addTaskTemp(taskTemp);
+    }
+  }
+
+  addTaskTemp(taskTemp: TaskTemplate) {
+    this.caseService.addTaskTemp(taskTemp).subscribe(res => {
+      taskTemp.id = (res as unknown as Result).data as string;
+      this.ref.close(taskTemp);
+    });
   }
 
   close() {
@@ -95,8 +142,8 @@ export class TaskTemplateDialogComponent implements OnInit {
   }
 
   cleanDateType(e) {
-    this.templateForm.get('startDays').reset('');
-    this.templateForm.get('endDays').reset('');
+    this.templateForm.get('startDays').reset(0);
+    this.templateForm.get('endDays').reset(0);
     this.templateForm.get('start').reset('');
     this.templateForm.get('end').reset('');
     this.templateForm.clearValidators();
@@ -108,7 +155,6 @@ export class TaskTemplateDialogComponent implements OnInit {
   }
 
   selectRangeDate(e) {
-    console.log('selectRangeDate', this.rangeDates)
   }
 }
 

@@ -1,4 +1,5 @@
-import {TaskTemplate} from "./taskTemplate";
+import { TaskTemplate } from './taskTemplate';
+import { taxTypes } from '../config/taxType';
 
 export class AnalyzerInput {
   id?: string;
@@ -10,44 +11,62 @@ export class AnalyzerInput {
   label?: string;
 }
 
+export class AnalyzerName {
+  name: string;
+  id: string;
+}
+
+export class AnalyzerSelect {
+  id?: string;
+  label?: string;
+  inputType?: number;
+  title: string;
+}
+
 export class TableItem {
   input: AnalyzerInput;
 }
 
 export class Tree {
+  id?: string;
   name?: string;
   title?: string;
-  condition: string | TableItem[];
+  cond: string | TableItem[];
   description?: string;
   summary?: string;
   advice?: string;
   status?: number;
-  condConns?: boolean[];
   knowledgeIds?: string[];
   taskTemplates?: TaskTemplate[];
+  taskTemplateIds?: string;
+  showAllAd?: boolean;
+  showTask?: boolean;
+  showAllTask?: boolean;
 }
 
 export class Analyzer {
+  id?: string;
   name: string;
   type: string;
   online: boolean;
-  runMonth: string[];
+  taxType: number;
   applyOn: string | TableItem[];
   tree: Tree[];
+  analyzerInputs: AnalyzerInput[] | AnalyzerSelect[];
 
   constructor() {
     this.name = '';
     this.type = '--';
     this.online = false;
-    this.runMonth = [];
-    this.applyOn = [{input: {title: '', value: ''}}];
+    this.taxType = taxTypes.all;
+    this.applyOn = [{ input: { title: '', value: '' } }];
     this.tree = [
       {
         status: 0,
-        condConns: [],
-        condition: [{input: {title: '', symbol: '', value: ''}}],
+        cond: [{ input: { title: '', symbol: '', value: '' } }],
         taskTemplates: [],
       }
     ];
+    this.analyzerInputs = [];
   }
 }

@@ -1,9 +1,9 @@
-<div style="margin: 10px 0;">
-  <p-breadcrumb [model]="breadMenuItems" [home]="menuHome"></p-breadcrumb>
-</div>
-
-<div style="display: flex;">
-  <app-case-list></app-case-list>
-  <app-case-edit></app-case-edit>
-  <!-- <app-path-task [analyzer]="analyzer"></app-path-task> -->
+<div class="app-component-container">
+  <app-case-list (setAnalyzer)="setAnalyzer($event)"></app-case-list>
+  <div class="analyzer-edit">
+    <p-card *ngIf="analyzer && operate">
+      <app-analyzer-edit [operate]="operate" (analyzerDeleted)="deleteAnalyzer($event)" [analyzer]="analyzer">
+      </app-analyzer-edit>
+    </p-card>
+  </div>
 </div>

@@ -32,6 +32,10 @@ import { SidebarModule } from 'primeng/sidebar';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { AccordionModule } from 'primeng/accordion';
+import { CarouselModule } from 'primeng/carousel';
+import { ListboxModule } from 'primeng/listbox';
+import { BlockUIModule } from 'primeng/blockui';
+import { ToastModule } from 'primeng/toast';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -43,6 +47,8 @@ import { TaskCreateComponent } from './component/task-create/task-create.compone
 import { PathTaskComponent } from './component/path-task/path-task.component';
 import { DataViewModule, MessageModule, MessagesModule, VirtualScrollerModule } from 'primeng';
 import { TaskTemplateDialogComponent } from './component/task-template-dialog/task-template-dialog.component';
+import { CreateCaseDialogComponent } from './component/create-case-dialog/create-case-dialog.component';
+import { AnalyzerEditComponent } from './component/analyzer-edit/analyzer-edit.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +59,8 @@ import { TaskTemplateDialogComponent } from './component/task-template-dialog/ta
     TaskCreateComponent,
     PathTaskComponent,
     TaskTemplateDialogComponent,
+    CreateCaseDialogComponent,
+    AnalyzerEditComponent,
   ],
   imports: [
     HttpClientModule,
@@ -89,8 +97,12 @@ import { TaskTemplateDialogComponent } from './component/task-template-dialog/ta
     SelectButtonModule,
     ScrollPanelModule,
     AccordionModule,
+    CarouselModule,
     SidebarModule,
     DataViewModule,
+    ListboxModule,
+    BlockUIModule,
+    ToastModule
   ],
   providers: [],
   entryComponents: [AnalyzerPreviewComponent, TaskCreateComponent],

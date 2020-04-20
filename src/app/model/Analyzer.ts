@@ -53,6 +53,7 @@ export class Analyzer {
   applyOn: string | TableItem[];
   tree: Tree[];
   analyzerInputs: AnalyzerInput[] | AnalyzerSelect[];
+  analyzerShows?: AnalyzerShow[];
 
   constructor() {
     this.name = '';
@@ -68,5 +69,12 @@ export class Analyzer {
       }
     ];
     this.analyzerInputs = [];
+    this.analyzerShows = [];
   }
+
+}
+
+export interface AnalyzerShow {
+  id: string,
+  title: string
 }

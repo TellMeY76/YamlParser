@@ -26,9 +26,9 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
   @Output() analyzerDeleted = new EventEmitter<any>();
 
   constructor(public caseService: CaseServiceService,
-              public dialogService: DialogService,
-              private messageService: MessageService,
-              private confirmationService: ConfirmationService) { }
+    public dialogService: DialogService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService) { }
 
   ngOnInit() {
   }
@@ -84,7 +84,7 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
     const analyzer = this.setYamlData();
     this.caseService.updateAnalyzer(analyzer).subscribe(res => {
       const resData = (res as unknown as Result).data;
-      this.analyzer.tree = this.updateAnalyzerTree(resData.treeIds);
+      this.analyzer.tree = this.updateAnalyzerTree(resData);
       this.showSuccess('分析器更新成功！');
     });
   }
@@ -190,7 +190,7 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
       },
       header: '预览分析器',
       width: '90%',
-      height: '700px',
+      height: '780px',
       closable: false
     });
   }
@@ -214,7 +214,7 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
             (conditionsRequired.filter(input => input.title === current.input.title)[0] as AnalyzerInput)?.title : '';
           val = current.input.title
             ? (index > 0 ? ' AND ' : '') +
-            `${appLabel} = ${current.input.value}`
+            `${appLabel} ${current.input.value ? `=${current.input.value}` : 'is NULL'}`
             : '';
         }
         return total + val;
@@ -234,7 +234,7 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
               (conditionsRequired.filter(input => input.title === current.input.title)[0] as AnalyzerInput)?.title : '';
             val = current.input?.title
               ? (index > 0 ? ' AND ' : '') +
-              `${condLabel} ${current.input.symbol ? current.input.symbol : '='} ${current.input.value}`
+              `${condLabel} ${current.input.value ? ((current.input.symbol ? current.input.symbol : '=') + current.input.value) : 'is NULL'}`
               : '';
           }
           return total + val;

@@ -40,9 +40,8 @@ export class CaseListComponent implements OnInit {
   openAddDialog() {
     const ref = this.dialogService.open(CreateCaseDialogComponent, {
       header: '新建分析器',
-      width: '1000px',
       data: {},
-      contentStyle: { height: '820px', overflow: 'auto' },
+      contentStyle: { width: '80vw', overflow: 'auto' },
       closable: true
     });
 

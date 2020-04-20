@@ -1,9 +1,19 @@
-<div class="dialog-content" *ngIf="analyzer" (show)="showDialogMaximized($event,dialDetail)" #dialDetail>
+<div class="analyzer-preview dialog-content" *ngIf="analyzer" (show)="showDialogMaximized($event,dialDetail)"
+  #dialDetail>
 
   <h2 class="dialig-title">{{analyzer.name}}（{{analyzer.online ? '已上线' : '未上线'}}）</h2>
   <p class="dialig-line--1st">分析器类型：{{analyzer.type}}</p>
   <p class="dialig-line--1st">纳税人类型：{{TaxTypeNames[analyzer.taxType]}}</p>
   <p class="dialig-line--1st">运行前提条件： {{analyzer?.applyOn || '无'}}</p>
+  <p class="dialig-line--1st">分析器展示项：
+    <ng-template [ngIf]="analyzer.analyzerShows" [ngIfElse]="noAnalyzerShows">
+      <span *ngFor="let item of analyzer?.analyzerShows;index as i">{{i>0?'、':''}}{{item.title}}</span>
+    </ng-template>
+    <ng-template #noAnalyzerShows>
+      暂无
+    </ng-template>
+  </p>
+
   <p class="dialig-line--1st">分析器({{analyzer.tree.length}})：</p>
   <p-accordion [multiple]="true" styleClass='accordion'>
     <p-accordionTab

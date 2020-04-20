@@ -1,6 +1,5 @@
 <div class="analyzer-container">
-    <app-case-edit [analyzer]="analyzer" [ngStyle]="{'display':showTaskView?'none':'block'}"
-        (setTasks)="showTasks($event)">
+    <app-case-edit [analyzer]="analyzer" [ngStyle]="{'display':showTaskView?'none':'block'}">
     </app-case-edit>
 
     <app-path-task #taskBlock [ngStyle]="{'display':!showTaskView?'none':'block'}" [analyzer]="analyzer"

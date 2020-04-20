@@ -11,7 +11,9 @@ import { TaskBind } from '../model/taskBind';
 export class CaseServiceService {
 
   httpOptions;
-  baseUrl = 'http://172.18.0.4:8084';
+  // baseUrl = 'http://172.18.1.103:9091';
+  baseUrl = 'http://172.18.0.165:9091';
+
   API = {
     EDIT_ANALYZER_BY_ID: '/analyzer/',
     GET_ANALYZER_LIST: '/analyzer_list',
@@ -21,7 +23,8 @@ export class CaseServiceService {
     GET_TASK_TEMP_BY_ID: '/task_template/',
     GET_ALL_TASK_TEMPS: '/task_template',
     ADD_TASK_TEMP: '/task_template/+',
-    BIND_TASK_TEMP: '/analyzer/task/bind'
+    BIND_TASK_TEMP: '/analyzer/task/bind',
+    GET_ANALYZER_SHOW: '/analyzer_show'
   };
 
   constructor(private http: HttpClient) {
@@ -62,6 +65,16 @@ export class CaseServiceService {
   getCondition() {
     this.makeHttpOptions();
     const url = `${this.baseUrl}${this.API.GET_CONDITION}`;
+    return this.http.get<any>(url, this.httpOptions).pipe(
+      map(res => {
+        return res;
+      })
+    );
+  }
+
+  getAnalyzerSHow() {
+    this.makeHttpOptions();
+    const url = `${this.baseUrl}${this.API.GET_ANALYZER_SHOW}`;
     return this.http.get<any>(url, this.httpOptions).pipe(
       map(res => {
         return res;

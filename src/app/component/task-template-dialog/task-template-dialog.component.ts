@@ -141,20 +141,18 @@ export class TaskTemplateDialogComponent implements OnInit {
     this.ref.close(null);
   }
 
-  cleanDateType(e) {
-    this.templateForm.get('startDays').reset(0);
-    this.templateForm.get('endDays').reset(0);
-    this.templateForm.get('start').reset('');
-    this.templateForm.get('end').reset('');
-    this.templateForm.clearValidators();
-    const dateType = this.templateForm.get('dateType').value;
-
-    if (dateType === 2) {
-      this.templateForm.setValidators(identityRevealedValidator);
+  cleanDateType() {
+    if (!this.templateForm.disabled) {
+      this.templateForm.get('startDays').reset(0);
+      this.templateForm.get('endDays').reset(0);
+      this.templateForm.get('start').reset('');
+      this.templateForm.get('end').reset('');
+      this.templateForm.clearValidators();
+      const dateType = this.templateForm.get('dateType').value;
+      if (dateType === 2) {
+        this.templateForm.setValidators(identityRevealedValidator);
+      }
     }
-  }
-
-  selectRangeDate(e) {
   }
 }
 

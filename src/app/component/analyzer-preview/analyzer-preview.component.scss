@@ -1,9 +1,9 @@
-.dialog-content {
-  height: 700px;
+.analyzer-preview.dialog-content {
+  height: 80vh;
   padding: 0 10px 20px 10px;
 
   .accordion.ui-accordion {
-    max-height: 430px;
+    max-height: 60vh;
     overflow: auto;
     .ui-accordion-content {
       max-height: 400px;

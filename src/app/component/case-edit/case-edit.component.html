@@ -35,6 +35,12 @@
     </p-multiSelect>
   </div>
   <div class="fldInput singleInput">
+    <h4 class="content-h4">分析器展示项：</h4>
+    <p-multiSelect [maxSelectedLabels]=4 selectedItemsLabel="已选 {0} 项" defaultLabel="请选取需要展示的项" [options]="analyzerShow"
+      [(ngModel)]="analyzer.analyzerShows">
+    </p-multiSelect>
+  </div>
+  <div class="fldInput singleInput">
     <h4 class="content-h4">分析器上线：</h4>
     <p-inputSwitch [(ngModel)]="analyzer.online"></p-inputSwitch>
   </div>
@@ -87,7 +93,19 @@
         </div>
 
         <h4 class="content-h4">条件项 <i (click)="addCondition(treeItem)" class="addBtn pi pi-plus-circle"></i>
+          <!-- <button class="overlayPanel-btn ui-button-secondary" type="text" pButton icon="pi pi-question-circle"
+            label="特殊日期怎么输入？" (click)="op1.toggle($event)"></button> -->
+          <a class="overlayPanel-link" (click)="op1.toggle($event)">特殊日期怎么输入？</a>
         </h4>
+        <p-overlayPanel #op1>
+          <h3>特殊日期输入规则：</h3>
+          <ul class="overlayPanel-ul">
+            <li *ngFor="let item of specialDates">
+              {{item.title}}: {{item.val}} <a [cdkCopyToClipboard]="item.val" (click)="showTCMsg(op1)">复制</a>
+            </li>
+          </ul>
+        </p-overlayPanel>
+
         <p-table [value]="treeItem.cond">
           <ng-template pTemplate="header">
             <tr>
@@ -136,3 +154,5 @@
 <p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000"></p-confirmDialog>
 
 <p-messages class="notification" [(value)]="messages"></p-messages>
+
+<p-toast [style]="{marginTop: '80px'}" position="top-center" key="tc"></p-toast>

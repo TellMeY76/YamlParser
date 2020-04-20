@@ -63,8 +63,6 @@
 }
 
 .dialog-content {
-  width: 400px;
-  max-height: 450px;
   padding: 0 10px;
 
   .dialig-line {
@@ -218,4 +216,22 @@
 .taxRadio.ui-radiobutton {
   margin-left: 20px;
   vertical-align: bottom;
+}
+
+.overlayPanel-link {
+  cursor: pointer;
+  float: right;
+}
+
+.overlayPanel-ul {
+  margin-top: 0;
+  padding: 0;
+  li {
+    margin: 10px 0;
+    list-style-type: none;
+    a {
+      cursor: pointer;
+      margin-left: 10px;
+    }
+  }
 }

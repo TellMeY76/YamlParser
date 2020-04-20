@@ -2,6 +2,7 @@
   align-items: center;
   background-color: #eff1f3;
   border-radius: 6px;
+  justify-content: space-between;
   padding: 5px;
   height: 60px;
   margin-bottom: 10px;
@@ -11,6 +12,7 @@
 
   &:hover .btn-group {
     display: flex;
+    width: 46px;
   }
   &:hover .task-temp-val {
     color: #007ad9 !important;

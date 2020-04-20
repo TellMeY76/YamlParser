@@ -4,6 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+
 
 // primeng
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -36,6 +38,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { ListboxModule } from 'primeng/listbox';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -102,7 +105,9 @@ import { AnalyzerEditComponent } from './component/analyzer-edit/analyzer-edit.c
     DataViewModule,
     ListboxModule,
     BlockUIModule,
-    ToastModule
+    ToastModule,
+    OverlayPanelModule,
+    ClipboardModule
   ],
   providers: [],
   entryComponents: [AnalyzerPreviewComponent, TaskCreateComponent],

@@ -2,13 +2,14 @@ import { ChangeDetectorRef, Component, OnInit, Output, EventEmitter, Input, OnCh
 import { ConfirmationService, Message, MessageService, SelectItem } from 'primeng/api';
 import { CaseServiceService } from 'src/app/service/case-service.service';
 import { AnalyzerPreviewComponent } from '../analyzer-preview/analyzer-preview.component';
-import { DialogService } from 'primeng';
-import { Analyzer, AnalyzerInput, TableItem, AnalyzerSelect } from '../../model/Analyzer';
+import { DialogService, OverlayPanel } from 'primeng';
+import { Analyzer, AnalyzerInput, TableItem, AnalyzerSelect, AnalyzerShow } from '../../model/Analyzer';
 import { Result } from '../../model/result';
 import { numReg, noSpecial } from '../../config/regex';
 import { TaskTemplate } from '../../model/taskTemplate';
 import { TaskTemplateDialogComponent } from '../task-template-dialog/task-template-dialog.component';
 import { taxTypes } from 'src/app/config/taxType';
+import { SPECIAL_DATES } from 'src/app/config/dateFormat';
 
 @Component({
   selector: 'app-case-edit',
@@ -29,14 +30,17 @@ export class CaseEditComponent implements OnInit, OnChanges {
   KnowledgeIds: SelectItem[];
   @Input() analyzer: Analyzer;
   conditions: AnalyzerInput[];
+  analyzerShow: SelectItem[];
   conditionsRequired: SelectItem[];
   messages: Message[];
   TaxTypes = taxTypes;
   @Output() setTasks = new EventEmitter<Analyzer>();
+  specialDates = SPECIAL_DATES;
 
   constructor(
     public caseService: CaseServiceService,
     public dialogService: DialogService,
+    private messageService: MessageService,
     public confirmationService: ConfirmationService,
     private changeDetectorRef: ChangeDetectorRef) {
     this.initVariable();
@@ -105,6 +109,7 @@ export class CaseEditComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.getConditionInput();
+    this.getAnalyzerShow();
     // this.initRunMonthList();
   }
 
@@ -122,6 +127,21 @@ export class CaseEditComponent implements OnInit, OnChanges {
     this.caseService.getCondition().subscribe(res => {
       this.conditions = this.setConditionInput((res as unknown as Result).data ?? []);
     });
+  }
+
+  getAnalyzerShow() {
+    this.caseService.getAnalyzerSHow().subscribe(res => {
+      this.analyzerShow = this.setAnalyzerShow((res as unknown as Result).data ?? []);
+    });
+  }
+
+  setAnalyzerShow(analyzerData: AnalyzerShow[]) {
+    return analyzerData.map(item => {
+      return {
+        label: item.title,
+        value: item
+      }
+    })
   }
 
   tabChange(e) {
@@ -157,11 +177,6 @@ export class CaseEditComponent implements OnInit, OnChanges {
   }
 
   removeApplyOn(input: TableItem) {
-    if ((this.analyzer.applyOn as TableItem[]).length === 1) {
-      this.messages = [];
-      this.messages.push({ severity: 'warn', summary: '警告', detail: 'applyOn 不为空' });
-      return;
-    }
     const index = (this.analyzer.applyOn as TableItem[]).indexOf(input);
     this.analyzer.applyOn = (this.analyzer.applyOn as TableItem[]).filter((val, i) => i !== index);
   }
@@ -270,5 +285,11 @@ export class CaseEditComponent implements OnInit, OnChanges {
 
   setPathTasks() {
     this.setTasks.emit(this.analyzer);
+  }
+
+  showTCMsg(overlaypanel: OverlayPanel) {
+    overlaypanel.hide();
+    this.messageService.clear();
+    this.messageService.add({ key: 'tc', severity: 'success', summary: '复制成功！', detail: '复制的内容可直接粘贴到输入框中使用' });
   }
 }

@@ -29,7 +29,6 @@ export class TableItem {
 
 export class Tree {
   id?: string;
-  name?: string;
   title?: string;
   cond: string | TableItem[];
   description?: string;
@@ -57,14 +56,14 @@ export class Analyzer {
 
   constructor() {
     this.name = '';
-    this.type = '--';
+    this.type = '';
     this.online = false;
     this.taxType = taxTypes.all;
-    this.applyOn = [{ input: { title: '', value: '' } }];
+    this.applyOn = [];
     this.tree = [
       {
         status: 0,
-        cond: [{ input: { title: '', symbol: '', value: '' } }],
+        cond: [],
         taskTemplates: [],
       }
     ];
@@ -75,6 +74,15 @@ export class Analyzer {
 }
 
 export interface AnalyzerShow {
-  id: string,
-  title: string
+  id: string;
+  title: string;
+}
+
+
+export interface AnalysisResult {
+  id: string;
+  name: string;
+  summary: string;
+  advice: string;
+  status: number;
 }

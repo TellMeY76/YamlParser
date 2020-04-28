@@ -2,6 +2,8 @@
   <app-case-list (setAnalyzer)="setAnalyzer($event)"></app-case-list>
   <div class="analyzer-edit">
     <p-card *ngIf="analyzer && operate">
+      <h2 class="analyzer-title ">{{analyzer.name}}</h2>
+
       <app-analyzer-edit [operate]="operate" (analyzerDeleted)="deleteAnalyzer($event)" [analyzer]="analyzer">
       </app-analyzer-edit>
     </p-card>

@@ -5,6 +5,7 @@ import { Result } from '../../model/result';
 import { Analyzer, AnalyzerInput, AnalyzerName } from 'src/app/model/Analyzer';
 import { DialogService } from 'primeng';
 import { CreateCaseDialogComponent } from '../create-case-dialog/create-case-dialog.component';
+import { isSpecialVal, setSpecialVal } from 'src/app/util/specialVal';
 
 @Component({
   selector: 'app-case-list',
@@ -47,19 +48,6 @@ export class CaseListComponent implements OnInit {
 
     ref.onClose.subscribe(res => {
       this.getAnalyzerList();
-      // const labelItems = this.analyzers.find(item => item.label === res.type);
-      // const items: MenuItem[] = [{
-      //   label: res.name, command: () => {
-      //     this.getAnalyzerById(res.id);
-      //   }
-      // }];
-      // if (labelItems) {
-      //   labelItems.items.concat(items);
-      // } else {
-      //   const label = res.type;
-      //   this.analyzers.concat([{ label, items }] ?? []);
-      // }
-
     });
 
   }
@@ -84,19 +72,19 @@ export class CaseListComponent implements OnInit {
 
   getAnalyzerById(analyzerId: string) {
     this.caseService.getAnalyzerById(analyzerId).subscribe(res => {
-      const resData = (res as unknown as Result).data;
+      const resData: Analyzer = (res as unknown as Result).data;
       this.setAnalyzer.emit(this.setAnalyzerConditions(resData));
     });
   }
 
   setAnalyzerConditions(analyzer: Analyzer) {
     const newAnalyzer = JSON.parse(JSON.stringify(analyzer)) as Analyzer;
-    if (typeof newAnalyzer.applyOn === 'string') {
+    if (typeof newAnalyzer.applyOn === 'string' && newAnalyzer.applyOn) {
       newAnalyzer.applyOn = this.splitBySymbol(newAnalyzer.applyOn);
     }
 
     newAnalyzer.tree = newAnalyzer.tree.map(treeItem => {
-      if (typeof treeItem.cond === 'string') {
+      if (typeof treeItem.cond === 'string' && treeItem.cond) {
         treeItem.cond = this.splitBySymbol(treeItem.cond);
       }
       return treeItem;
@@ -123,16 +111,21 @@ export class CaseListComponent implements OnInit {
     if (str) {
       const arr = str.split('AND');
       const symbolReg = /[~!><=]/g;
+      const isReg = /IS/;
       return arr.map(item => {
-        let title: string;
-        let symbol: string;
-        let value: string;
-        const symbolArr = item.match(symbolReg);
+        let title: string; let symbol: string; let value: string;
+        const reg = symbolReg.test(item) ? symbolReg : isReg;
+        const symbolArr = item.match(reg);
         if (symbolArr) {
-          symbol = item.match(symbolReg).join('');
+          symbol = symbolArr.join('');
           const keyValue = item.split(symbol);
           title = keyValue[0].trim();
           value = keyValue[1].trim();
+        }
+        symbol = symbol === 'IS' ? '=' : symbol;
+        const specialKeyVal = isSpecialVal(value, 'en');
+        if (specialKeyVal) {
+          value = setSpecialVal(specialKeyVal.key, value, specialKeyVal.val);
         }
         return { input: { title, symbol, value } };
       });

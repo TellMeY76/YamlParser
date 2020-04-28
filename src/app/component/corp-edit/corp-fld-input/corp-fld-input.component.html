@@ -1,0 +1,17 @@
+<div [formGroup]="corpForm">
+    <div class="p-grid">
+        <div class="p-col">
+            <container-element [ngSwitch]="formFldType">
+                <p-calendar *ngSwitchCase="inputType.date" styleClass="fld-calendar" [dateFormat]="dateFormat"
+                    [locale]="zh" placeholder="请输入对应日期" [formControlName]="formCtrlName">
+                </p-calendar>
+
+                <input *ngSwitchDefault pInputText type="text" class="fld-input ui-inputtext" placeholder="请输入对应值"
+                    [formControlName]="formCtrlName">
+            </container-element>
+        </div>
+        <p-message class="p-col" *ngIf="!isValid" severity="error"
+            [text]="'请输入'+( formFldType===inputType.date?'日期':formFldType===inputType.text?'文字':'数字')+'类型的值'">
+        </p-message>
+    </div>
+</div>

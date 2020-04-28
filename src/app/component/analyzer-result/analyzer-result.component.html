@@ -1,0 +1,41 @@
+<div class="dialog-container">
+  <div *ngIf="!loading else loadingBlock">
+    <h3>{{analysisResult.name}} --（{{analysisType[analysisResult.status]}}）</h3>
+    <p-fieldset legend="建议摘要">
+      <div class="p-grid">
+        <pre>{{analysisResult.summary}}</pre>
+      </div>
+    </p-fieldset>
+
+    <p-fieldset legend="建议正文" styleClass="advice-field">
+      <div class="text-content">
+        <pre>{{analysisResult.advice}}</pre>
+      </div>
+    </p-fieldset>
+
+    <!-- <p-fieldset legend="生成任务">
+      <div class="p-grid">
+        <div class="p-col-4">
+          <p-card header="任务标题" subheader="执行人：王伟" styleClass="task-item ui-card-shadow">
+            <div class="ui-card-subtitle">时间：2020-04-01~2020-04-20</div>
+            <div>
+              首先，你需要在设计稿上用方框圈出每一个组件（包括它们的子组件）的名称！
+            </div>
+          </p-card>
+        </div>
+      </div>
+    </p-fieldset> -->
+
+    <p-footer class="dialog-footer">
+      <button type="button" pButton icon="pi pi-replay" (click)="reAnalyse()" label="重新编辑公司信息"></button>
+    </p-footer>
+  </div>
+
+  <ng-template #loadingBlock>
+    <div class="loading-block">
+      <p-progressSpinner></p-progressSpinner>
+      <h3 class="loading-label">正在分析...</h3>
+    </div>
+  </ng-template>
+
+</div>

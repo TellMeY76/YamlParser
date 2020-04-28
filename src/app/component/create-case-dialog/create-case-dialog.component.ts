@@ -17,10 +17,9 @@ export class CreateCaseDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.analyzer = new Analyzer();
-    // this.analyzer.runMonth = [...Array(12).keys()].map(item => item + 1 + '');
   }
 
   addNewAnalyzer(analyzerName) {
-    this.ref.close();
+    this.ref.close(true);
   }
 }

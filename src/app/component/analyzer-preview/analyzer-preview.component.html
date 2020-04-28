@@ -17,7 +17,7 @@
   <p class="dialig-line--1st">分析器({{analyzer.tree.length}})：</p>
   <p-accordion [multiple]="true" styleClass='accordion'>
     <p-accordionTab
-      [header]="(treeItem.name ? treeItem.name : 'CASE' + (i + 1)) + (treeItem.status === 0?' ✘ ':treeItem.status === 1?' ✔ ':' ? ')"
+      [header]="(treeItem.title ? treeItem.title : '分析路径' + (i + 1)) + (treeItem.status === 0?' ✘ ':treeItem.status === 1?' ✔ ':' ? ')"
       *ngFor="let treeItem of analyzer.tree;index as i">
       <p class="dialig-line--2nd">
         需满足条件：{{treeItem?.cond || '无'}}，条件满足时触发分析结果，包括：

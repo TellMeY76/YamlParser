@@ -1,4 +1,5 @@
 <div class="analyzer-container">
+
     <app-case-edit [analyzer]="analyzer" [ngStyle]="{'display':showTaskView?'none':'block'}">
     </app-case-edit>
 
@@ -6,15 +7,20 @@
         (setTasks)="hideTasks($event)"></app-path-task>
 </div>
 <p-footer class="foot-bar">
-    <button pButton type="button" label="预览" icon="pi pi-search" (click)='showPreDialog()' style="margin-right: .5em"
-        class="ui-button-secondary"></button>
-    <button pButton type="button" label="保存" icon="pi pi-check" style="margin-right: .5em"
-        (click)='clickSave()'></button>
+
+    <button pButton type="button" label="预览" icon="pi pi-search" (click)='showPreDialog()'
+        class="tool-btn ui-button-secondary"></button>
+    <button pButton type="button" label="保存" icon="pi pi-check" class="tool-btn" (click)='clickSave()'></button>
+
     <ng-template [ngIf]="analyzer.id">
+        <ng-template [ngIf]="operate!=='create'">
+            <button pButton type="button" label="模拟分析" icon="pi pi-spinner" (click)='clickMockAnalyzer()'
+                class="tool-btn ui-button-success"></button>
+            <button pButton type="button" label="删除分析器" icon="pi pi-check" (click)='deleteAnalyzer()'
+                class="tool-btn ui-button-danger"></button>
+        </ng-template>
         <button pButton type="button" *ngIf="!showTaskView " label="任务配置" icon="pi pi-check" (click)='setTaskConfirm()'
-            style="margin-right: .5em"></button>
-        <button pButton type="button" label="删除分析器" icon="pi pi-check" (click)='deleteAnalyzer()'
-            style="margin-right: .5em" class="ui-button-danger"></button>
+            class="tool-btn"></button>
     </ng-template>
 </p-footer>
 <p-confirmDialog [style]="{width: '30vw'}"></p-confirmDialog>

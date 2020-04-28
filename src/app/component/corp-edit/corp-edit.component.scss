@@ -1,0 +1,31 @@
+.edit-table.ui-table {
+    .ui-table-caption {
+        padding: 12px;
+        text-align: left;
+        font-size: 20px;
+    }
+    .ui-table-globalfilter-container {
+        float: right;
+        input {
+            width: 200px;
+        }
+    }
+
+    .ui-paginator-current {
+        float: left;
+    }
+
+    .ui-inputgroup {
+        .pi {
+            line-height: 1.25;
+        }
+        input {
+            width: 65%;
+        }
+
+        .ui-inputgroup-addon,
+        input {
+            font-size: 16px;
+        }
+    }
+}

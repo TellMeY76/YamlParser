@@ -1,0 +1,21 @@
+.dialog-container {
+    position: relative;
+    padding-bottom: 50px;
+
+    .dialog-footer {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+}
+.corp-edit.dialog-container {
+    max-height: 490px;
+    height: 490px;
+    overflow-y: auto;
+    .ui-datepicker {
+        min-width: 25em;
+        td {
+            font-weight: 400;
+        }
+    }
+}

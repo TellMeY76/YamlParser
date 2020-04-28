@@ -22,9 +22,9 @@ export class AnalyzerPreviewComponent implements OnInit {
   constructor(public ref: DynamicDialogRef, public dialogConfig: DynamicDialogConfig) {
     this.analyzer = dialogConfig.data.analyzer;
     this.analyzer.tree = this.analyzer.tree.map(item => {
-      const showHideObj = { showAllAd: false, showTask: true, showAllTask: false }
-      item = { ...item, ...showHideObj }
-      return item
+      const showHideObj = { showAllAd: false, showTask: true, showAllTask: false };
+      item = { ...item, ...showHideObj };
+      return item;
     });
   }
 

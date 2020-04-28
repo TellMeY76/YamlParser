@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { MenuItem, ConfirmationService, Message, MessageService } from 'primeng/api';
-import { Analyzer, AnalyzerInput, AnalyzerSelect } from '../../model/Analyzer';
+import { Analyzer, AnalyzerInput, AnalyzerSelect, AnalysisResult } from '../../model/Analyzer';
 import { AnalyzerPreviewComponent } from '../../component/analyzer-preview/analyzer-preview.component';
 import { CaseServiceService } from '../../service/case-service.service';
 import { DialogService } from 'primeng';
@@ -8,6 +8,12 @@ import { TaskBind } from '../../model/taskBind';
 import { Result } from '../../model/result';
 import { OPERATE } from '../../config/operate';
 import { safeDump } from 'js-yaml';
+import { CorpEditComponent } from '../corp-edit/corp-edit.component';
+import { CorpAnalyzerData } from 'src/app/model/corp';
+import { DELAY_TIME } from 'src/app/config/delay';
+import { AnalyzerResultComponent } from '../analyzer-result/analyzer-result.component';
+import { setSpecialVal, isSpecialVal } from 'src/app/util/specialVal';
+import { ERR_CODE } from 'src/app/config/errCode';
 
 @Component({
   selector: 'app-analyzer-edit',
@@ -24,11 +30,12 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
   treeIds: string[] = [];
   @Output() addNewAnalyzer = new EventEmitter<any>();
   @Output() analyzerDeleted = new EventEmitter<any>();
+  timeId;
 
   constructor(public caseService: CaseServiceService,
-    public dialogService: DialogService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService) { }
+              public dialogService: DialogService,
+              private messageService: MessageService,
+              private confirmationService: ConfirmationService) { }
 
   ngOnInit() {
   }
@@ -83,9 +90,14 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
   updateAnalyzer() {
     const analyzer = this.setYamlData();
     this.caseService.updateAnalyzer(analyzer).subscribe(res => {
-      const resData = (res as unknown as Result).data;
-      this.analyzer.tree = this.updateAnalyzerTree(resData);
-      this.showSuccess('分析器更新成功！');
+      const result = (res as unknown as Result);
+      if (result.errCode === ERR_CODE.DUPLICATES) {
+        this.showErr('存在条件重复的分析项，请检查并修改后再次保存');
+      } else {
+        const resData = result.data;
+        this.analyzer.tree = this.updateAnalyzerTree(resData);
+        this.showSuccess('分析器更新成功！');
+      }
     });
   }
 
@@ -190,8 +202,68 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
       },
       header: '预览分析器',
       width: '90%',
-      height: '780px',
-      closable: false
+      closable: true
+    });
+  }
+
+
+  clickMockAnalyzer() {
+    const message = '是否需要先保存当前分析器内容?';
+    this.confirmationService.confirm({
+      message,
+      header: '温馨提示',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.updateAnalyzer();
+        setTimeout(() => {
+          this.getCorpAnalyzerData(this.analyzer.id);
+        }, 1000);
+      },
+      reject: () => {
+        if (this.analyzer.id) {
+          this.getCorpAnalyzerData(this.analyzer.id);
+        }
+      }
+    });
+  }
+
+  getCorpAnalyzerData(analyzerId) {
+    this.caseService.getCorpAnalyzerDataById(analyzerId).subscribe(res => {
+      const corpAnalyzerData: CorpAnalyzerData[] = res.data ?? {};
+      const ref = this.dialogService.open(CorpEditComponent, {
+        header: `模拟分析 -- 编辑公司信息`,
+        width: '70%',
+        data: { corpAnalyzerData }
+      });
+
+      ref.onClose.subscribe((needAnalyze: boolean) => {
+        if (needAnalyze) {
+          if (this.timeId) { clearTimeout(this.timeId); }
+          this.timeId = setTimeout(() => { this.reAnalyze(corpAnalyzerData, analyzerId); }, DELAY_TIME.DIALOG_REOPEN);
+        }
+      });
+    });
+  }
+
+  reAnalyze(corpData: CorpAnalyzerData[], analyzerId: string) {
+    this.caseService.getAnalyzerResultById(analyzerId).subscribe(res => {
+      const analysisResult = res?.data as AnalysisResult;
+      this.showAnalyzerResDialog(analysisResult, true);
+    });
+  }
+
+  showAnalyzerResDialog(analysisResult: AnalysisResult, needLoading?: boolean) {
+    const analyzerId = this.analyzer.id;
+    const ref = this.dialogService.open(AnalyzerResultComponent, {
+      header: `模拟分析 -- 分析结果`,
+      width: '80%',
+      data: { analysisResult, needLoading, analyzerId }
+    });
+    ref.onClose.subscribe((needAnalyze: boolean) => {
+      if (needAnalyze) {
+        if (this.timeId) { clearTimeout(this.timeId); }
+        this.timeId = setTimeout(() => { this.getCorpAnalyzerData(analyzerId); }, DELAY_TIME.DIALOG_REOPEN);
+      }
     });
   }
 
@@ -209,12 +281,18 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
     if (typeof analyzerJson.applyOn !== 'string') {
       applyOn = analyzerJson.applyOn.reduce((total, current, index) => {
         let val = '';
-        if (current.input.title?.trim()) {
+        let inputVal = current.input.value;
+        const inputTitle = current.input.title;
+        const specialKeyVal = isSpecialVal(inputVal);
+        if (specialKeyVal) {
+          inputVal = setSpecialVal(specialKeyVal.key, inputVal, specialKeyVal.val, 'en');
+        }
+        if (inputTitle?.trim()) {
           const appLabel = conditionsRequired ?
-            (conditionsRequired.filter(input => input.title === current.input.title)[0] as AnalyzerInput)?.title : '';
-          val = current.input.title
+            (conditionsRequired.filter(item => item.title === inputTitle)[0] as AnalyzerInput)?.title : '';
+          val = inputTitle
             ? (index > 0 ? ' AND ' : '') +
-            `${appLabel} ${current.input.value ? `=${current.input.value}` : 'is NULL'}`
+            `${appLabel} ${(inputVal && inputVal !== 'NULL') ? `= ${inputVal}` : 'IS NULL'}`
             : '';
         }
         return total + val;
@@ -229,12 +307,21 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
       if (typeof item.cond !== 'string') {
         item.cond = item.cond.reduce((total, current, index) => {
           let val = '';
-          if (current.input.title?.trim()) {
+          let inputVal = current.input.value;
+          const inputTitle = current.input.title;
+          const specialKeyVal = isSpecialVal(inputVal);
+          if (specialKeyVal) {
+            inputVal = setSpecialVal(specialKeyVal.key, inputVal, specialKeyVal.val, 'en');
+          }
+          if (inputTitle?.trim()) {
             const condLabel = conditionsRequired ?
-              (conditionsRequired.filter(input => input.title === current.input.title)[0] as AnalyzerInput)?.title : '';
-            val = current.input?.title
-              ? (index > 0 ? ' AND ' : '') +
-              `${condLabel} ${current.input.value ? ((current.input.symbol ? current.input.symbol : '=') + current.input.value) : 'is NULL'}`
+              (conditionsRequired.filter(input => input.title === inputTitle)[0] as AnalyzerInput)?.title : '';
+            val = inputVal
+              ? (index > 0 ? ' AND ' : '') + `${condLabel}
+              ${(inputVal && inputVal !== 'NULL')
+                ? `${current.input.symbol ? current.input.symbol : '='} ${inputVal}`
+                : 'IS NULL'
+              }`
               : '';
           }
           return total + val;
@@ -243,10 +330,6 @@ export class AnalyzerEditComponent implements OnInit, OnChanges {
       return item;
     });
     return tree;
-  }
-
-  downYaml() {
-    const yaml = safeDump(this.setYamlData());
   }
 
   private setTaskTempIds() {

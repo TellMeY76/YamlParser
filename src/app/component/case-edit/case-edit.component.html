@@ -1,33 +1,20 @@
 <div>
-  <!-- <p-steps [model]="stepItems" styleClass="steps-custom"></p-steps> -->
   <h3 class="content-h3">分析器基本信息</h3>
 
   <div class="fldInput singleInput">
     <h4 class="content-h4">适用的纳税人类型：</h4>
-    <p-radioButton name="taxtype" styleClass="taxRadio" [value]="TaxTypes.all" label="全部类型"
-      [(ngModel)]="analyzer.taxType"></p-radioButton>
-    <p-radioButton name="taxType" styleClass="taxRadio" [value]="TaxTypes.smScale" label="小规模纳税人"
-      [(ngModel)]="analyzer.taxType">
-    </p-radioButton>
-    <p-radioButton name="taxType" styleClass="taxRadio" [value]="TaxTypes.general" label="一般纳税人"
-      [(ngModel)]="analyzer.taxType">
-    </p-radioButton>
+    <p-selectButton [options]="selectTaxTypes" [(ngModel)]="analyzer.taxType"></p-selectButton>
   </div>
 
   <div class="fldInput singleInput">
     <h4 class="content-h4">分析器类型：</h4>
-    <p-dropdown [options]="types" [(ngModel)]="analyzer.type" placeholder="分析器类型" [showClear]="false"></p-dropdown>
+    <input type="text" pInputText class="basic-input" [(ngModel)]="analyzer.type" />
   </div>
 
   <div class="fldInput singleInput">
     <h4 class="content-h4">分析器名称：</h4>
-    <input type="text" pInputText style="width: 26em;" [(ngModel)]="analyzer.name" />
+    <input type="text" pInputText class="basic-input" [(ngModel)]="analyzer.name" />
   </div>
-  <!-- <div class="fldInput singleInput">
-    <h4 class="content-h4">分析器运行时间：</h4>
-    <p-multiSelect [filter]="false" [maxSelectedLabels]=12 [options]="month" [(ngModel)]="analyzer.runMonth">
-    </p-multiSelect>
-  </div> -->
   <div class="fldInput singleInput">
     <h4 class="content-h4">分析器所需条件：</h4>
     <p-multiSelect [maxSelectedLabels]=4 selectedItemsLabel="已选 {0} 项" defaultLabel="请选取需要用到的条件" [options]="conditions"
@@ -53,6 +40,7 @@
         <th style="width: 5em;">操作</th>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="body" let-tree>
       <tr>
         <td>
@@ -68,40 +56,40 @@
         </td>
       </tr>
     </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="3" style="text-align: center;">暂无</td>
+      </tr>
+    </ng-template>
   </p-table>
 
   <h3 class="content-h3">配置分析项 <i (click)="addConditionTab()" class="addBtn pi pi-plus-circle"></i>
   </h3>
   <div>
-    <p-tabView (onChange)="tabChange($event)" (onClose)="checkTabAfterClose($event)">
-      <p-tabPanel *ngFor="let treeItem of analyzer.tree;index as i" [selected]="i===0"
-        [header]="treeItem.name?treeItem.name.toUpperCase():'未命名'" [closable]="analyzer.tree.length > 1">
+    <p-tabView [activeIndex]="selectedTabIdx" (onChange)="tabChange($event)" (onClose)="checkTabAfterClose($event)">
+      <p-tabPanel headerStyleClass='tree-header' *ngFor="let treeItem of analyzer.tree;index as i"
+        [header]="treeItem.title?treeItem.title:'未命名'" [closable]="analyzer.tree.length > 1">
         <div class="analyzerTable">
-          <div class="fldInput">
-            <h4 class="content-h4">case名称:</h4>
-            <input type="text" pInputText (blur)="upperCaseName()" [(ngModel)]="treeItem.name" />
-          </div>
           <div class="fldInput">
             <h4 class="content-h4">标题:</h4>
             <input type="text" pInputText style="width: 26em;" [(ngModel)]="treeItem.title" />
           </div>
           <div class="fldInput">
-            <h4 class="content-h4">case状态:</h4>
+            <h4 class="content-h4">分析项状态:</h4>
             <p-dropdown [options]="status" [(ngModel)]="treeItem.status"></p-dropdown>
           </div>
 
         </div>
 
         <h4 class="content-h4">条件项 <i (click)="addCondition(treeItem)" class="addBtn pi pi-plus-circle"></i>
-          <!-- <button class="overlayPanel-btn ui-button-secondary" type="text" pButton icon="pi pi-question-circle"
-            label="特殊日期怎么输入？" (click)="op1.toggle($event)"></button> -->
-          <a class="overlayPanel-link" (click)="op1.toggle($event)">特殊日期怎么输入？</a>
+          <a class="overlayPanel-link" (click)="op1.toggle($event)">特殊日期输入注意事项</a>
         </h4>
         <p-overlayPanel #op1>
-          <h3>特殊日期输入规则：</h3>
+          <h3>以下值须严格按照规定格式输入：</h3>
           <ul class="overlayPanel-ul">
             <li *ngFor="let item of specialDates">
-              {{item.title}}: {{item.val}} <a [cdkCopyToClipboard]="item.val" (click)="showTCMsg(op1)">复制</a>
+              {{item.title}} 输入格式为 : {{item.val}} <a [cdkCopyToClipboard]="item.val" (click)="showTCMsg(op1)">复制</a>
             </li>
           </ul>
         </p-overlayPanel>
@@ -114,7 +102,9 @@
               <th>判断值</th>
               <th style="width: 5em;">操作</th>
             </tr>
+
           </ng-template>
+
           <ng-template pTemplate="body" let-cond let-rowIndex="rowIndex">
             <tr>
               <td>
@@ -132,6 +122,12 @@
                 <button pButton type="button" class="ui-button-danger" icon="pi pi-trash"
                   (click)="removeCondition(cond)"></button>
               </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4" style="text-align: center;">暂无</td>
             </tr>
           </ng-template>
         </p-table>

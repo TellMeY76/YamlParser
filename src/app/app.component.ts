@@ -50,7 +50,6 @@ export class AppComponent implements OnInit {
   }
 
   deleteAnalyzer(analyzerId: string) {
-    console.log('delete Analyzer');
     this.operate = '';
     this.caseListComponent.getAnalyzerList();
   }

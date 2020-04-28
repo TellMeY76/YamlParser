@@ -4,6 +4,8 @@ import { map } from 'rxjs/operators';
 import { Analyzer } from '../model/Analyzer';
 import { TaskTemplate } from '../model/taskTemplate';
 import { TaskBind } from '../model/taskBind';
+import { Result } from '../model/result';
+import { CorpAnalyzerData } from '../model/corp';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +13,8 @@ import { TaskBind } from '../model/taskBind';
 export class CaseServiceService {
 
   httpOptions;
-  // baseUrl = 'http://172.18.1.103:9091';
-  baseUrl = 'http://172.18.0.165:9091';
+  baseUrl = 'http://172.18.1.103:9091';
+  // baseUrl = 'http://172.18.0.165:9091';
 
   API = {
     EDIT_ANALYZER_BY_ID: '/analyzer/',
@@ -24,7 +26,10 @@ export class CaseServiceService {
     GET_ALL_TASK_TEMPS: '/task_template',
     ADD_TASK_TEMP: '/task_template/+',
     BIND_TASK_TEMP: '/analyzer/task/bind',
-    GET_ANALYZER_SHOW: '/analyzer_show'
+    GET_ANALYZER_SHOW: '/analyzer_show',
+    GET_CORP_ANALYZERDATA: '/corp/data',
+    UPDATE_CORP: '/corp/data/!',
+    ANALYZE: '/analyze/'
   };
 
   constructor(private http: HttpClient) {
@@ -142,14 +147,33 @@ export class CaseServiceService {
     );
   }
 
+  getAnalyzerResultById(analyzerId: string, corpId?: string) {
+    this.makeHttpOptions();
+    const corpID = corpId ?? '1';
+    const url = `${this.baseUrl}${this.API.ANALYZE}${corpID}/${analyzerId}`;
+    return this.http.get<any>(url, this.httpOptions).pipe(
+      map(res => res as unknown as Result)
+    );
+  }
+
+  getCorpAnalyzerDataById(analyzerId: string, corpId?: string) {
+    this.makeHttpOptions();
+    const corpID = corpId ?? '1';
+    const url = `${this.baseUrl}${this.API.GET_CORP_ANALYZERDATA}/${corpID}/${analyzerId}`;
+    return this.http.get<any>(url, this.httpOptions).pipe(
+      map(res => res as unknown as Result)
+    );
+  }
+
+  updateCorpAnalyzerData(corpAnalyzerData: CorpAnalyzerData[]) {
+    this.makeHttpOptions();
+    const url = `${this.baseUrl}${this.API.UPDATE_CORP}`;
+    return this.http.post<any>(url, corpAnalyzerData, this.httpOptions).pipe(
+      map(res => res as unknown as Result)
+    );
+  }
+
   private makeHttpOptions() {
-    // const authToken = (<User>this.session.getUser()).authToken;
-    // this.httpOptions = {
-    //   headers: new HttpHeaders({
-    //     'Content-Type': 'application/json',
-    //     'Authorization': authToken,
-    //   })
-    // };
     this.httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',

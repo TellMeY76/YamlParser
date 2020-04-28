@@ -39,6 +39,9 @@ import { ListboxModule } from 'primeng/listbox';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { FieldsetModule } from 'primeng/fieldset';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -52,6 +55,9 @@ import { DataViewModule, MessageModule, MessagesModule, VirtualScrollerModule } 
 import { TaskTemplateDialogComponent } from './component/task-template-dialog/task-template-dialog.component';
 import { CreateCaseDialogComponent } from './component/create-case-dialog/create-case-dialog.component';
 import { AnalyzerEditComponent } from './component/analyzer-edit/analyzer-edit.component';
+import { CorpEditComponent } from './component/corp-edit/corp-edit.component';
+import { AnalyzerResultComponent } from './component/analyzer-result/analyzer-result.component';
+import { CorpFldInputComponent } from './component/corp-edit/corp-fld-input/corp-fld-input.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +70,9 @@ import { AnalyzerEditComponent } from './component/analyzer-edit/analyzer-edit.c
     TaskTemplateDialogComponent,
     CreateCaseDialogComponent,
     AnalyzerEditComponent,
+    AnalyzerResultComponent,
+    CorpEditComponent,
+    CorpFldInputComponent
   ],
   imports: [
     HttpClientModule,
@@ -107,10 +116,14 @@ import { AnalyzerEditComponent } from './component/analyzer-edit/analyzer-edit.c
     BlockUIModule,
     ToastModule,
     OverlayPanelModule,
-    ClipboardModule
+    ClipboardModule,
+    FieldsetModule,
+    ProgressSpinnerModule,
+    TooltipModule
   ],
   providers: [],
-  entryComponents: [AnalyzerPreviewComponent, TaskCreateComponent],
+  entryComponents: [AnalyzerPreviewComponent, TaskCreateComponent, CorpEditComponent,
+    AnalyzerResultComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -22,7 +22,7 @@
     "@angular/router": "~9.0.2",
     "@fullcalendar/core": "^4.4.0",
     "@types/js-yaml": "^3.12.2",
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "js-yaml": "^3.13.1",
     "primeicons": "^2.0.0",
     "primeng": "^9.0.0-rc.4",
